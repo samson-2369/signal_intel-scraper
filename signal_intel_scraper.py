@@ -2,75 +2,67 @@ import feedparser
 from datetime import datetime
 import os
 
+# THE FIXED PATH: Your local GitHub folder
+VAULT_PATH = "/Users/jackcornell/Documents/GitHub/signal_intel-scraper"
+
 # 1. Your Watchlist: Keywords & Specialized Feeds
-# Optimized for ICS/OT, Satellite, and RF Security
 keywords = [
-    "satellite", "GNSS", "GPS", "spoofing", "jamming", 
-    "ICS", "SCADA", "PLC", "modbus", "industrial", 
+    "satellite", "GNSS", "GPS", "spoofing", "jamming",
+    "ICS", "SCADA", "PLC", "modbus", "industrial",
     "RF", "radio", "telemetry", "firmware", "physical layer",
     "zero-day", "exploit", "water sector", "energy grid"
 ]
 
-feeds = [
-    "https://therecord.media/feed/",
-    "https://www.cyberscoop.com/feed/",
-    "https://ics.sans.org/blog/feed/",          # Deep ICS/OT focus
-    "https://www.dragos.com/feed/",             # Industrial threat intel
-    "https://spacenews.com/feed/",              # Satellite industry
-    "https://www.cisa.gov/cybersecurity-advisories.xml", # Govt alerts
-    "https://krebsonsecurity.com/feed/",        # High-level security news
-    "https://darkreading.com/rss.xml"           # General industry trends
-]
+feeds = {
+    "The Record": "https://therecord.media/feed/",
+    "Cyberscoop": "https://www.cyberscoop.com/feed/",
+    "SANS ICS": "https://ics.sans.org/blog/feed/",
+    "Dragos": "https://www.dragos.com/feed/",
+    "SpaceNews": "https://spacenews.com/feed/",
+    "CISA Alerts": "https://www.cisa.gov/cybersecurity-advisories.xml",
+    "Krebs": "https://krebsonsecurity.com/feed/",
+    "DarkReading": "https://darkreading.com/rss.xml"
+}
 
 def run_scraper():
-    # Header with date for your Obsidian Article Feed
     date_str = datetime.now().strftime('%Y-%m-%d')
-    report_content = f"# Signal Intelligence Report - {date_str}\n\n"
-    
+    report_content = f"# 📡 Signal Intelligence Report: {date_str}\n\n"
     found_articles = 0
-    
-    print(f"Starting scan for {date_str}...")
 
-    # Process each feed
-    for url in feeds:
+    print(f"🚀 Starting scan for {date_str}...")
+
+    for name, url in feeds.items():
         try:
             feed = feedparser.parse(url)
-            source_name = feed.feed.title if 'title' in feed.feed else url
-            
             for entry in feed.entries:
                 # Check if keywords appear in title or summary
-                title = entry.title if 'title' in entry else "No Title"
-                summary = entry.summary if 'summary' in entry else ""
-                
+                title = entry.get('title', '')
+                summary = entry.get('summary', '')
                 content_to_check = (title + summary).lower()
                 
                 if any(key.lower() in content_to_check for key in keywords):
                     report_content += f"### [{title}]({entry.link})\n"
-                    report_content += f"*Source: {source_name}*\n\n"
+                    report_content += f"*Source: {name}*\n\n"
                     found_articles += 1
         except Exception as e:
-            print(f"Could not reach {url}: {e}")
+            print(f"⚠️ Could not reach {name}: {e}")
 
     if found_articles == 0:
-        report_content += "_No specific keyword matches found in today's top stories._\n\n"
+        report_content += "*No specific keyword matches found in today's top stories.*\n"
 
-    # --- Research Notes Section ---
-    # This section stays at the bottom for you to fill out in Obsidian
-    report_content += "---\n"
-    report_content += "## 📝 My Research Notes\n"
-    report_content += "> Use this space to connect today's news to the 'When Software Meets the Physical World' series.\n\n"
-    report_content += "### 💡 Key Takeaways\n- \n\n"
-    report_content += "### 🛠️ Hardware/RF Connection\n- \n\n"
-    report_content += "### 📝 Article Ideas\n- \n\n"
-    report_content += "### ✅ To-Do\n- [ ] Fact-check this for the website\n- [ ] Archive relevant diagrams\n"
-
-    # 2. Save with a unique date so your feed grows over time
-    filename = f"report_{date_str}.md"
+    report_content += "\n---\n## 📝 My Research Notes\n> Use this space to connect today's news to the 'When Software Meets the Physical World' series.\n"
     
-    with open(filename, "w") as f:
+    # Save the file
+    if not os.path.exists(VAULT_PATH):
+        os.makedirs(VAULT_PATH)
+    
+    filename = f"report_{date_str}.md"
+    full_path = os.path.join(VAULT_PATH, filename)
+    
+    with open(full_path, "w") as f:
         f.write(report_content)
     
-    print(f"Success! Generated {filename} with {found_articles} articles found.")
+    print(f"✅ Success! {found_articles} signals saved to Obsidian.")
 
 if __name__ == "__main__":
     run_scraper()

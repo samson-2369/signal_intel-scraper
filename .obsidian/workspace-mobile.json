@@ -11,14 +11,17 @@
             "id": "1c395e2e5cbda1c4",
             "type": "leaf",
             "state": {
-              "type": "markdown",
+              "type": "canvas",
               "state": {
-                "file": "report_2026-02-22.md",
-                "mode": "source",
-                "source": false
+                "file": "Untitled.canvas",
+                "viewState": {
+                  "x": 28.666666666666686,
+                  "y": 262.33333333333337,
+                  "zoom": 0
+                }
               },
-              "icon": "lucide-file",
-              "title": "report_2026-02-22"
+              "icon": "lucide-layout-dashboard",
+              "title": "Untitled"
             }
           }
         ]
@@ -166,5 +169,12 @@
     }
   },
   "active": "1c395e2e5cbda1c4",
-  "lastOpenFiles": []
+  "lastOpenFiles": [
+    "site_health_report.md",
+    "Untitled.canvas",
+    "report_2026-02-23.md",
+    "daily_intel_report.md",
+    "report_2026-02-22.md",
+    "draft_2026-02-23_ukraine-energy-grid-attacks-and-inputs-lie.md"
+  ]
 }

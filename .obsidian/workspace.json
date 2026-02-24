@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "dadf163fb050ed44",
+        "id": "4c0daad73621f52a",
         "type": "tabs",
         "children": [
           {
-            "id": "70926e007406ae1f",
+            "id": "00308297cf3d05a3",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -183,14 +183,20 @@
       "bases:Create new base": false
     }
   },
-  "active": "70926e007406ae1f",
+  "active": "00308297cf3d05a3",
   "lastOpenFiles": [
-    "article_starter.py",
-    "site_health_report.md",
+    "Untitled.canvas",
+    "daily_intel_report.md",
     "report_2026-02-23.md",
+    "com.jackcornell.signalintel.plist",
+    "draft_2026-02-23_ukraine-energy-grid-attacks-and-inputs-lie.md",
+    "archiver.py",
+    "weekly_digest.py",
+    "Untitled.md",
+    "site_health_report.md",
+    "article_starter.py",
     "site_auditor.py",
     "report_2026-02-22.md",
-    "daily_intel_report.md",
     "~$ily_intel_report.md"
   ]
 }
