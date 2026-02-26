@@ -4,24 +4,21 @@
     "type": "split",
     "children": [
       {
-        "id": "9e7904486325ab45",
+        "id": "d86bb2667ce904d3",
         "type": "tabs",
         "children": [
           {
-            "id": "1c395e2e5cbda1c4",
+            "id": "c97cf4bf3147a3b3",
             "type": "leaf",
             "state": {
-              "type": "canvas",
+              "type": "markdown",
               "state": {
-                "file": "Untitled.canvas",
-                "viewState": {
-                  "x": 28.666666666666686,
-                  "y": 262.33333333333337,
-                  "zoom": 0
-                }
+                "file": "report_2026-02-25.md",
+                "mode": "source",
+                "source": false
               },
-              "icon": "lucide-layout-dashboard",
-              "title": "Untitled"
+              "icon": "lucide-file",
+              "title": "report_2026-02-25"
             }
           }
         ]
@@ -168,13 +165,19 @@
       "bases:Create new base": false
     }
   },
-  "active": "1c395e2e5cbda1c4",
+  "active": "c97cf4bf3147a3b3",
   "lastOpenFiles": [
+    "Draft Article 02-25-2026.md",
+    "report_2026-02-25.md",
     "site_health_report.md",
-    "Untitled.canvas",
-    "report_2026-02-23.md",
+    "Untitled 1.md",
+    "Inputs Lie Thesis.md",
+    "report_2026-02-24.md",
+    "When the Grid Becomes a Targeting Sensor -The Lethal Feedback Loop.md",
+    "Untitled.md",
     "daily_intel_report.md",
     "report_2026-02-22.md",
-    "draft_2026-02-23_ukraine-energy-grid-attacks-and-inputs-lie.md"
+    "report_2026-02-23.md",
+    "Untitled.canvas"
   ]
 }
