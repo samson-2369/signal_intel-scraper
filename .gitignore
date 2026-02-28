@@ -1,0 +1,12 @@
+*.md
+.obsidian/
+Untitled*
+*.canvas
+archiver.py
+article_starter.py
+daily_launcher.py
+site_auditor.py
+weekly_digest.py
+!README.md
+!daily_briefing.html
+!signal_intel_scraper.py
