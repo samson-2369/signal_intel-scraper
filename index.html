@@ -3,32 +3,133 @@
     <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-        <title>CORNELL SECURITY | INTEL DASHBOARD</title>
+        <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
+        <title>CORNELL SECURITY | MOBILE INTEL</title>
         <style>
             :root {
                 --bg: #0d1117; --card-bg: #161b22; --border: #30363d;
-                --text-main: #c9d1d9; --accent-green: #238636;
+                --text-main: #c9d1d9; --accent-green: #3fb950;
                 --accent-blue: #58a6ff;
             }
-            body { font-family: sans-serif; background: var(--bg); color: var(--text-main); max-width: 800px; margin: auto; padding: 20px; }
-            .header { border-left: 4px solid var(--accent-green); padding-left: 15px; margin-bottom: 30px; }
+            body { 
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; 
+                background: var(--bg); color: var(--text-main); 
+                margin: 0; padding: 15px; line-height: 1.5;
+            }
+            .header { 
+                border-left: 5px solid var(--accent-green); 
+                padding: 10px 15px; margin-bottom: 25px; background: rgba(255,255,255,0.03);
+            }
+            h1 { font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px; margin: 0; color: #fff; }
+            .status { font-family: monospace; font-size: 0.7rem; color: var(--accent-green); margin-top: 5px; }
             .live-dot { height: 8px; width: 8px; background: var(--accent-green); border-radius: 50%; display: inline-block; margin-right: 5px; animation: pulse 2s infinite; }
             @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-            .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 15px; }
-            .title { display: block; color: var(--accent-blue); font-weight: bold; text-decoration: none; margin-bottom: 10px; }
+            
+            .card { 
+                background: var(--card-bg); border: 1px solid var(--border); 
+                border-radius: 10px; padding: 18px; margin-bottom: 15px; 
+                box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            }
+            .tag { font-family: monospace; font-size: 0.65rem; color: var(--accent-blue); text-transform: uppercase; font-weight: bold; }
+            .title { 
+                display: block; color: #f0f6fc; font-size: 1.1rem; 
+                font-weight: 600; text-decoration: none; margin: 10px 0;
+            }
+            .summary { color: #8b949e; font-size: 0.85rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+            footer { text-align: center; color: #484f58; font-size: 0.7rem; margin-top: 40px; padding-bottom: 20px; }
+            
+            /* Desktop Adjustment */
+            @media (min-width: 768px) {
+                body { max-width: 800px; margin: auto; padding: 40px; }
+                h1 { font-size: 1.6rem; }
+            }
         </style>
     </head>
     <body>
         <div class="header">
             <h1>Signal Intelligence Station</h1>
-            <div style="font-family:monospace; font-size:0.8rem; color:var(--accent-green);">
-                <span class="live-dot"></span> CONNECTION SECURE | SYNC: 2026-02-28 10:07:40
-            </div>
+            <div class="status"><span class="live-dot"></span> SECURE CONNECTION | 2026-02-28 10:12:38</div>
         </div>
-    <div class="card"><a class="title" href="https://spacenews.com/nasa-revises-plans-for-future-artemis-missions-cancels-upgrades-to-sls/">NASA revises plans for future Artemis missions, cancels upgrades to SLS</a><p style="font-size:0.9rem;"><figure><img alt="SLS/Orion 2026 Feb 2" class="attachment-rss-image-size size-rss-image-size wp-post-image" height="683" src="https://i0.wp.com/spacenews.com/wp-content/uploads/2026/02/art2-20260202.j...</p></div><div class="card"><a class="title" href="https://spacenews.com/rocket-lab-delays-neutron-debut-to-late-2026/">Rocket Lab delays Neutron debut to late 2026</a><p style="font-size:0.9rem;"><figure><img alt="" class="attachment-rss-image-size size-rss-image-size wp-post-image" height="666" src="https://i0.wp.com/spacenews.com/wp-content/uploads/2024/11/Screenshot-2024-11-03-at-4.57.16%E2...</p></div><div class="card"><a class="title" href="https://spacenews.com/china-set-for-its-first-one-year-human-spaceflight-mission-confirms-pakistani-astronaut-flight/">China set for its first one-year human spaceflight mission, confirms Pakistani astronaut flight</a><p style="font-size:0.9rem;"><figure><img alt="Chinese astronaut Zhang Lu in a white spacesuit with red markings works outside the Tiangong space station, attached to a robotic arm, with Earth’s oceans and cloud-covered surface v...</p></div><div class="card"><a class="title" href="https://spacenews.com/space-force-keeps-door-open-to-future-human-presence-in-orbit/">Space Force keeps door open to future human presence in orbit</a><p style="font-size:0.9rem;"><figure><img alt="" class="attachment-rss-image-size size-rss-image-size wp-post-image" height="683" src="https://i0.wp.com/spacenews.com/wp-content/uploads/2026/02/55114913075_8532980a42_k.jpg?fit=10...</p></div><div class="card"><a class="title" href="https://spacenews.com/virgin-media-o2-launches-europes-first-starlink-direct-to-smartphone-service/">Virgin Media O2 launches Europe’s first Starlink direct-to-smartphone service</a><p style="font-size:0.9rem;"><figure><img alt="" class="attachment-rss-image-size size-rss-image-size wp-post-image" height="609" src="https://i0.wp.com/spacenews.com/wp-content/uploads/2026/02/Starlink-D2C-pic-scaled.jpeg?fit=10...</p></div><div class="card"><a class="title" href="https://cyberscoop.com/cisa-leadership-change-madhu-gottumukkala-nick-andersen/">Gottumukkala out, Andersen in as acting CISA director</a><p style="font-size:0.9rem;"><p>The move follows a story about criticisms of CISA’s performance during the first year of the Trump administration, with Madhu Gottumukkala’s leadership a point of contention.</p>
-<p>The post <a hre...</p></div><div class="card"><a class="title" href="https://cyberscoop.com/project-compass-the-com-europol/">Project Compass is Europol’s new playbook for taking on The Com</a><p style="font-size:0.9rem;"><p>Officials said 30 perpetrators have been arrested in the past year, and global law enforcement cooperation is closing the gap.</p>
-<p>The post <a href="https://cyberscoop.com/project-compass-the-co...</p></div><div class="card"><a class="title" href="https://cyberscoop.com/senate-passes-health-care-cyber-reforms-cassidy/">Senate moves one step closer to passing health care cyber reforms</a><p style="font-size:0.9rem;"><p>A legislative package that would overhaul cybersecurity practices at the Department of Health and Human Services sailed through committee. </p>
-<p>The post <a href="https://cyberscoop.com/senate-pa...</p></div><div class="card"><a class="title" href="https://cyberscoop.com/cisco-zero-days-cisa-emergency-directive-five-eyes/">Governments issue warning over Cisco zero-day attacks dating back to 2023</a><p style="font-size:0.9rem;"><p>The global campaign marks the second series of multiple actively exploited zero-day vulnerabilities in Cisco edge technology since last spring. The similarities don’t end there.</p>
-<p>The post <a ...</p></div><div class="card"><a class="title" href="https://cyberscoop.com/vulncheck-exploited-vulnerabilities-report-2025/">Vulnerabilities grew like weeds in 2025, but only 1% were weaponized in attacks</a><p style="font-size:0.9rem;"><p>Too many defenders and researchers are paying attention to defects and unsubstantiated exploit concepts that aren’t worth their time, VulnCheck’s Caitlin Condon said.</p>
-<p>The post <a href="https...</p></div><div class="card"><a class="title" href="https://therecord.media/samsung-updates-acr-privacy-practices-texas">Samsung updates ACR privacy practices after Texas sues TV manufacturers</a><p style="font-size:0.9rem;">In December, Texas sued five major smart TV manufacturers — Samsung, Sony, LG, Hisense and TCL Technology — for allegedly collecting ACR data without consumers in the state being fully informed and co...</p></div><div class="card"><a class="title" href="https://therecord.media/instagram-alert-parents-children-search-terms-self-harm">Instagram to start alerting parents when children search for terms relating to self-harm</a><p style="font-size:0.9rem;">Parents in the U.S., U.K., Australia and Canada will soon receive alerts if a child repeatedly searches Instagram for content relating to self-harm or suicide....</p></div><div class="card"><a class="title" href="https://therecord.media/eu-lawmakers-propose-youth-under-16-social-media-parental-consent">EU lawmakers propose that youth under 16 be barred from social media without parental consent</a><p style="font-size:0.9rem;">The opinion also states that social media access should not be allowed for children below age 13 under any circumstances....</p></div><div class="card"><a class="title" href="https://therecord.media/former-air-force-officer-arrested-for-working-with-hacker-flight-training-china">Former Air Force officer arrested for conspiring with hacker to provide flight training to Chinese military</a><p style="font-size:0.9rem;">Gerald Eddie Brown, 65, was arrested in Jeffersonville, Indiana on Thursday after spending nearly three years living in China and allegedly providing combat aircraft training to pilots in the Chinese ...</p></div><div class="card"><a class="title" href="https://therecord.media/wyden-blocks-rudd-confirmation-nsa-cyber-command">Wyden blocks Rudd confirmation to lead Cyber Command, NSA</a><p style="font-size:0.9rem;">Rudd “does not have the background that would allow him to immediately step into” the role of leading Cyber Command, Wyden wrote in a letter that was included in the Congressional Record on Wednesday....</p></div></body></html>
+    
+        <div class="card">
+            <span class="tag">SpaceNews (Satellite/GNSS)</span>
+            <a class="title" href="https://spacenews.com/nasa-revises-plans-for-future-artemis-missions-cancels-upgrades-to-sls/" target="_blank">NASA revises plans for future Artemis missions, cancels upgrades to SLS</a>
+            <p class="summary"><figure><img alt="SLS/Orion 2026 Feb 2" class="attachment-rss-image-size size-rss-image-size wp-post-image" height="683" src="https://i0.wp.com/spacenews.com/wp-content/uploads/2026/02/art2-20260202.jpeg?fit=1024%2C683&amp;ssl=1" width="1024" /></fig...</p>
+        </div>
+        <div class="card">
+            <span class="tag">SpaceNews (Satellite/GNSS)</span>
+            <a class="title" href="https://spacenews.com/rocket-lab-delays-neutron-debut-to-late-2026/" target="_blank">Rocket Lab delays Neutron debut to late 2026</a>
+            <p class="summary"><figure><img alt="" class="attachment-rss-image-size size-rss-image-size wp-post-image" height="666" src="https://i0.wp.com/spacenews.com/wp-content/uploads/2024/11/Screenshot-2024-11-03-at-4.57.16%E2%80%AFPM.png?fit=1024%2C666&amp;ssl=1" width="1024...</p>
+        </div>
+        <div class="card">
+            <span class="tag">SpaceNews (Satellite/GNSS)</span>
+            <a class="title" href="https://spacenews.com/china-set-for-its-first-one-year-human-spaceflight-mission-confirms-pakistani-astronaut-flight/" target="_blank">China set for its first one-year human spaceflight mission, confirms Pakistani astronaut flight</a>
+            <p class="summary"><figure><img alt="Chinese astronaut Zhang Lu in a white spacesuit with red markings works outside the Tiangong space station, attached to a robotic arm, with Earth’s oceans and cloud-covered surface visible in the background." class="attachment-rss-i...</p>
+        </div>
+        <div class="card">
+            <span class="tag">SpaceNews (Satellite/GNSS)</span>
+            <a class="title" href="https://spacenews.com/space-force-keeps-door-open-to-future-human-presence-in-orbit/" target="_blank">Space Force keeps door open to future human presence in orbit</a>
+            <p class="summary"><figure><img alt="" class="attachment-rss-image-size size-rss-image-size wp-post-image" height="683" src="https://i0.wp.com/spacenews.com/wp-content/uploads/2026/02/55114913075_8532980a42_k.jpg?fit=1024%2C683&amp;ssl=1" width="1024" /></figure>
+<p>Of...</p>
+        </div>
+        <div class="card">
+            <span class="tag">SpaceNews (Satellite/GNSS)</span>
+            <a class="title" href="https://spacenews.com/virgin-media-o2-launches-europes-first-starlink-direct-to-smartphone-service/" target="_blank">Virgin Media O2 launches Europe’s first Starlink direct-to-smartphone service</a>
+            <p class="summary"><figure><img alt="" class="attachment-rss-image-size size-rss-image-size wp-post-image" height="609" src="https://i0.wp.com/spacenews.com/wp-content/uploads/2026/02/Starlink-D2C-pic-scaled.jpeg?fit=1024%2C609&amp;ssl=1" width="1024" /></figure>
+<p>Br...</p>
+        </div>
+        <div class="card">
+            <span class="tag">CyberScoop (ICS/Infrastructure)</span>
+            <a class="title" href="https://cyberscoop.com/cisa-leadership-change-madhu-gottumukkala-nick-andersen/" target="_blank">Gottumukkala out, Andersen in as acting CISA director</a>
+            <p class="summary"><p>The move follows a story about criticisms of CISA’s performance during the first year of the Trump administration, with Madhu Gottumukkala’s leadership a point of contention.</p>
+<p>The post <a href="https://cyberscoop.com/cisa-leadership-change-m...</p>
+        </div>
+        <div class="card">
+            <span class="tag">CyberScoop (ICS/Infrastructure)</span>
+            <a class="title" href="https://cyberscoop.com/project-compass-the-com-europol/" target="_blank">Project Compass is Europol’s new playbook for taking on The Com</a>
+            <p class="summary"><p>Officials said 30 perpetrators have been arrested in the past year, and global law enforcement cooperation is closing the gap.</p>
+<p>The post <a href="https://cyberscoop.com/project-compass-the-com-europol/">Project Compass is Europol&#8217;s new...</p>
+        </div>
+        <div class="card">
+            <span class="tag">CyberScoop (ICS/Infrastructure)</span>
+            <a class="title" href="https://cyberscoop.com/senate-passes-health-care-cyber-reforms-cassidy/" target="_blank">Senate moves one step closer to passing health care cyber reforms</a>
+            <p class="summary"><p>A legislative package that would overhaul cybersecurity practices at the Department of Health and Human Services sailed through committee. </p>
+<p>The post <a href="https://cyberscoop.com/senate-passes-health-care-cyber-reforms-cassidy/">Senate mo...</p>
+        </div>
+        <div class="card">
+            <span class="tag">CyberScoop (ICS/Infrastructure)</span>
+            <a class="title" href="https://cyberscoop.com/cisco-zero-days-cisa-emergency-directive-five-eyes/" target="_blank">Governments issue warning over Cisco zero-day attacks dating back to 2023</a>
+            <p class="summary"><p>The global campaign marks the second series of multiple actively exploited zero-day vulnerabilities in Cisco edge technology since last spring. The similarities don’t end there.</p>
+<p>The post <a href="https://cyberscoop.com/cisco-zero-days-cisa-...</p>
+        </div>
+        <div class="card">
+            <span class="tag">CyberScoop (ICS/Infrastructure)</span>
+            <a class="title" href="https://cyberscoop.com/vulncheck-exploited-vulnerabilities-report-2025/" target="_blank">Vulnerabilities grew like weeds in 2025, but only 1% were weaponized in attacks</a>
+            <p class="summary"><p>Too many defenders and researchers are paying attention to defects and unsubstantiated exploit concepts that aren’t worth their time, VulnCheck’s Caitlin Condon said.</p>
+<p>The post <a href="https://cyberscoop.com/vulncheck-exploited-vulnerabilit...</p>
+        </div>
+        <div class="card">
+            <span class="tag">The Record (State Actors)</span>
+            <a class="title" href="https://therecord.media/samsung-updates-acr-privacy-practices-texas" target="_blank">Samsung updates ACR privacy practices after Texas sues TV manufacturers</a>
+            <p class="summary">In December, Texas sued five major smart TV manufacturers — Samsung, Sony, LG, Hisense and TCL Technology — for allegedly collecting ACR data without consumers in the state being fully informed and consenting....</p>
+        </div>
+        <div class="card">
+            <span class="tag">The Record (State Actors)</span>
+            <a class="title" href="https://therecord.media/instagram-alert-parents-children-search-terms-self-harm" target="_blank">Instagram to start alerting parents when children search for terms relating to self-harm</a>
+            <p class="summary">Parents in the U.S., U.K., Australia and Canada will soon receive alerts if a child repeatedly searches Instagram for content relating to self-harm or suicide....</p>
+        </div>
+        <div class="card">
+            <span class="tag">The Record (State Actors)</span>
+            <a class="title" href="https://therecord.media/eu-lawmakers-propose-youth-under-16-social-media-parental-consent" target="_blank">EU lawmakers propose that youth under 16 be barred from social media without parental consent</a>
+            <p class="summary">The opinion also states that social media access should not be allowed for children below age 13 under any circumstances....</p>
+        </div>
+        <div class="card">
+            <span class="tag">The Record (State Actors)</span>
+            <a class="title" href="https://therecord.media/former-air-force-officer-arrested-for-working-with-hacker-flight-training-china" target="_blank">Former Air Force officer arrested for conspiring with hacker to provide flight training to Chinese military</a>
+            <p class="summary">Gerald Eddie Brown, 65, was arrested in Jeffersonville, Indiana on Thursday after spending nearly three years living in China and allegedly providing combat aircraft training to pilots in the Chinese Air Force....</p>
+        </div>
+        <div class="card">
+            <span class="tag">The Record (State Actors)</span>
+            <a class="title" href="https://therecord.media/wyden-blocks-rudd-confirmation-nsa-cyber-command" target="_blank">Wyden blocks Rudd confirmation to lead Cyber Command, NSA</a>
+            <p class="summary">Rudd “does not have the background that would allow him to immediately step into” the role of leading Cyber Command, Wyden wrote in a letter that was included in the Congressional Record on Wednesday....</p>
+        </div><footer>© 2026 Cornell Security | Automated OSINT Research Pipeline</footer></body></html>
