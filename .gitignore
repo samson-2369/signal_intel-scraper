@@ -1,12 +1,17 @@
-*.md
+# Ignore Private Research
+Inputs Lie Thesis.md
+Draft Article*.md
+When the Grid Becomes a Targeting Sensor*.md
+Untitled.md
+Untitled.canvas
+
+# Ignore Workspace Metadata
 .obsidian/
-Untitled*
-*.canvas
+.DS_Store
+
+# Ignore all Python scripts except the main scraper
 archiver.py
 article_starter.py
 daily_launcher.py
 site_auditor.py
 weekly_digest.py
-!README.md
-!daily_briefing.html
-!signal_intel_scraper.py
