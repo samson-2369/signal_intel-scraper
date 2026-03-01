@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Logic Follows Lies: How PLCs and RTUs Fail Under Adversarial Conditions — Cornell Security</title>
+  <meta name="description" content="PLCs don't validate truth — they evaluate inputs. When those inputs are manipulated, deterministic logic becomes the attack surface. Part 3 of the ICS signal integrity series.">
+  <meta name="author" content="Norris Cornell">
+  <meta name="copyright" content="© 2024 Norris Cornell. All Rights Reserved.">
+  <link rel="canonical" href="https://cornellsecurity.com/blog/logic-follows-lies-plc-rtu.html">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .article-wrapper { max-width: 800px; margin: 0 auto; padding: 3rem 2rem 5rem; }
+    .article-header { margin-bottom: 3rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
+    .article-header h1 { font-family: var(--font-heading); font-size: clamp(1.7rem, 3.2vw, 2.4rem); font-weight: 700; color: #fff; line-height: 1.2; letter-spacing: 0.03em; margin-bottom: 1.25rem; }
+    .article-meta { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; margin-bottom: 0.75rem; }
+    .article-meta span { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); letter-spacing: 0.1em; }
+    .article-meta .meta-author { color: var(--accent-cyan); }
+    .series-badge { display: inline-block; font-family: var(--font-mono); font-size: 0.68rem; color: var(--accent-green); background: rgba(0,255,159,0.08); border: 1px solid rgba(0,255,159,0.2); padding: 0.3rem 0.75rem; border-radius: var(--radius); letter-spacing: 0.12em; margin-bottom: 1rem; }
+
+    .article-body h2 { font-family: var(--font-heading); font-size: 1.45rem; font-weight: 700; color: #fff; letter-spacing: 0.04em; margin: 2.75rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+    .article-body h3 { font-family: var(--font-heading); font-size: 1.05rem; font-weight: 600; color: var(--accent-cyan); letter-spacing: 0.06em; margin: 1.75rem 0 0.6rem; }
+    .article-body p { color: var(--text-secondary); font-size: 0.98rem; line-height: 1.85; margin-bottom: 1.15rem; }
+    .article-body strong { color: var(--text-primary); font-weight: 600; }
+
+    /* Opening statement */
+    .opening-block {
+      background: var(--bg-deep);
+      border: 1px solid var(--border-accent);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin-bottom: 2.5rem;
+      text-align: center;
+    }
+    .opening-block .headline {
+      font-family: var(--font-heading);
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      font-weight: 700;
+      color: var(--accent-cyan);
+      letter-spacing: 0.04em;
+      margin-bottom: 1.25rem;
+      display: block;
+    }
+    .opening-block .lines { list-style: none; padding: 0; margin: 0; }
+    .opening-block .lines li {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      padding: 0.3rem 0;
+      letter-spacing: 0.06em;
+      border-bottom: 1px solid var(--border);
+    }
+    .opening-block .lines li:last-child { border-bottom: none; }
+
+    /* Callouts */
+    .callout { background: rgba(0,212,255,0.05); border-left: 3px solid var(--accent-cyan); padding: 1rem 1.25rem; margin: 1.75rem 0; border-radius: 0 var(--radius) var(--radius) 0; }
+    .callout p { margin: 0; color: var(--text-primary); font-size: 1.02rem; font-style: italic; line-height: 1.7; }
+    .callout-red { border-left-color: var(--accent-red); background: rgba(255,71,87,0.05); }
+    .callout-green { border-left-color: var(--accent-green); background: rgba(0,255,159,0.05); }
+
+    /* PLC trust model */
+    .plc-logic {
+      background: #020508;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+    }
+    .plc-logic .plc-label { color: var(--accent-cyan); font-size: 0.7rem; letter-spacing: 0.15em; display: block; margin-bottom: 1rem; }
+    .plc-logic .plc-line { color: var(--accent-green); line-height: 2; }
+    .plc-logic .plc-missing { color: var(--accent-red); margin-top: 1rem; display: block; }
+    .plc-logic .plc-missing-item { color: var(--text-muted); display: block; line-height: 1.9; padding-left: 1rem; }
+
+    /* Failure mode blocks */
+    .failure-block {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+      margin: 1.5rem 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .failure-block::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--accent-red); }
+    .failure-num { font-family: var(--font-mono); font-size: 0.68rem; color: var(--accent-red); letter-spacing: 0.15em; margin-bottom: 0.5rem; }
+    .failure-block h3 { font-family: var(--font-heading); font-size: 1.1rem; font-weight: 700; color: #fff; margin: 0 0 0.75rem; letter-spacing: 0.04em; }
+    .failure-block p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.75; margin-bottom: 0.6rem; }
+    .failure-block p:last-child { margin-bottom: 0; }
+    .failure-block ul { list-style: none; padding: 0; margin: 0.75rem 0; }
+    .failure-block ul li { font-size: 0.87rem; color: var(--text-secondary); padding: 0.25rem 0; padding-left: 1rem; border-bottom: 1px solid var(--border); line-height: 1.5; position: relative; }
+    .failure-block ul li:last-child { border-bottom: none; }
+    .failure-block ul li::before { content: '▸'; color: var(--accent-red); position: absolute; left: 0; }
+    .failure-italic { font-family: var(--font-heading); color: var(--accent-red) !important; font-size: 0.95rem !important; font-weight: 600; margin-top: 0.75rem !important; }
+
+    /* Scenario blocks */
+    .scenario-block {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin: 1.25rem 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .scenario-block::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--accent-cyan); }
+    .scenario-num { font-family: var(--font-mono); font-size: 0.68rem; color: var(--accent-cyan); letter-spacing: 0.15em; margin-bottom: 0.4rem; }
+    .scenario-block h4 { font-family: var(--font-heading); font-size: 1rem; font-weight: 600; color: #fff; margin: 0 0 0.6rem; }
+    .scenario-block p { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 0.5rem; }
+    .scenario-block p:last-child { margin-bottom: 0; }
+    .scenario-block ul { list-style: none; padding: 0; margin: 0.5rem 0; }
+    .scenario-block ul li { font-size: 0.85rem; color: var(--text-secondary); padding: 0.2rem 0; padding-left: 1rem; position: relative; line-height: 1.5; }
+    .scenario-block ul li::before { content: '·'; color: var(--accent-cyan); position: absolute; left: 0; }
+
+    /* Defender gap list */
+    .defender-gap { background: rgba(0,212,255,0.04); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin: 1.25rem 0; }
+    .defender-gap .label { font-family: var(--font-mono); font-size: 0.68rem; color: var(--accent-cyan); letter-spacing: 0.15em; margin-bottom: 0.75rem; display: block; }
+    .defender-gap ul { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0; }
+    .defender-gap li { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-secondary); padding: 0.25rem 0.6rem; border: 1px solid var(--border); border-radius: var(--radius); }
+    .defender-gap .gap-note { margin-top: 1rem; font-size: 0.88rem; color: var(--text-secondary); border-top: 1px solid var(--border); padding-top: 0.75rem; }
+
+    /* Core insight block */
+    .insight-block {
+      background: linear-gradient(135deg, #0a1628, #0f2035);
+      border: 1px solid var(--border-accent);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .insight-block .label { font-family: var(--font-mono); font-size: 0.68rem; color: var(--accent-cyan); letter-spacing: 0.2em; margin-bottom: 1rem; display: block; }
+    .insight-block p { font-family: var(--font-heading); font-size: 1.1rem; font-weight: 600; color: #fff; letter-spacing: 0.03em; line-height: 1.5; margin: 0 0 0.5rem; }
+    .insight-block p:last-child { margin: 0; color: var(--text-secondary); font-size: 0.9rem; font-weight: 400; font-family: var(--font-body); }
+
+    /* Part 4 preview */
+    .preview-block { background: var(--bg-card); border: 1px solid var(--border-accent); border-radius: var(--radius); padding: 1.5rem; margin: 2.5rem 0; }
+    .preview-block .label { font-family: var(--font-mono); font-size: 0.68rem; color: var(--accent-green); letter-spacing: 0.18em; margin-bottom: 0.75rem; display: block; }
+    .preview-block h4 { font-family: var(--font-heading); font-size: 1rem; font-weight: 600; color: #fff; margin-bottom: 0.75rem; }
+    .preview-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+    .preview-list li { display: flex; gap: 0.75rem; font-size: 0.88rem; color: var(--text-secondary); padding: 0.35rem 0; border-bottom: 1px solid var(--border); }
+    .preview-list li:last-child { border-bottom: none; }
+    .preview-list li::before { content: '◈'; color: var(--accent-green); flex-shrink: 0; font-size: 0.7rem; margin-top: 3px; }
+
+    /* Sector callout */
+    .sector-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0; }
+    .sector-tag { font-family: var(--font-mono); font-size: 0.7rem; padding: 0.3rem 0.65rem; border: 1px solid var(--border); border-radius: var(--radius); color: var(--text-muted); }
+
+    /* Closing */
+    .closing-block { background: var(--bg-card); border: 1px solid rgba(0,212,255,0.2); border-radius: var(--radius); padding: 1.75rem; margin: 2rem 0; }
+    .closing-block p { font-size: 0.98rem; color: var(--text-secondary); line-height: 1.8; margin-bottom: 0.75rem; }
+    .closing-block .verdict { font-family: var(--font-heading); font-size: 1.1rem; color: var(--accent-cyan); font-weight: 700; letter-spacing: 0.04em; margin: 0; }
+
+    /* Author bio */
+    .author-bio { margin-top: 3rem; padding: 1.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); display: flex; gap: 1.25rem; align-items: flex-start; }
+    .bio-initials { width: 52px; height: 52px; background: linear-gradient(135deg, var(--accent-cyan), #0070f3); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--font-heading); font-size: 1rem; font-weight: 700; color: var(--bg-deep); flex-shrink: 0; }
+    .bio-text .bio-name { font-family: var(--font-heading); font-weight: 600; color: #fff; font-size: 1rem; margin-bottom: 0.25rem; }
+    .bio-text p { font-size: 0.85rem; color: var(--text-secondary); margin: 0; line-height: 1.7; }
+
+    .back-link { display: inline-flex; align-items: center; gap: 0.4rem; font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted); letter-spacing: 0.1em; margin-bottom: 2.5rem; transition: color var(--transition); }
+    .back-link:hover { color: var(--accent-cyan); }
+    .article-divider { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); letter-spacing: 0.2em; text-align: center; margin: 2.5rem 0; }
+
+    @media (max-width: 600px) { .author-bio { flex-direction: column; } }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-container">
+    <a href="../index.html" class="nav-brand">
+      <span class="brand-icon">◈</span>
+      <span>CORNELL <span class="brand-accent">SECURITY</span></span>
+    </a>
+    <div class="nav-links" id="navLinks">
+      <a href="../about.html">ABOUT</a>
+      <a href="../research.html">RESEARCH</a>
+      <a href="../blog.html" class="active">BLOG</a>
+      <a href="../contact.html">CONTACT</a>
+    </div>
+    <button class="nav-toggle" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
+  </div>
+</nav>
+
+<div class="page-wrapper">
+<div class="article-wrapper">
+
+  <a href="../blog.html" class="back-link">← BACK TO BLOG</a>
+
+  <div class="series-badge">BSIDES DELAWARE SERIES · PART 3</div>
+
+  <div class="article-header">
+    <div class="article-meta">
+      <span class="meta-author">NORRIS CORNELL</span>
+      <span>·</span>
+      <span>ICS/OT · PLC/RTU · SIGNAL INTEGRITY</span>
+    </div>
+    <h1>Logic Follows Lies: How PLCs and RTUs Fail Under Adversarial Conditions</h1>
+  </div>
+
+  <div class="article-body">
+
+    <!-- Opening -->
+    <div class="opening-block">
+      <span class="headline">If inputs lie, logic will follow.</span>
+      <ul class="lines">
+        <li>Industrial control systems don't reason.</li>
+        <li>They don't question.</li>
+        <li>They don't validate truth.</li>
+        <li>They evaluate.</li>
+      </ul>
+    </div>
+
+    <p>
+      A PLC or RTU accepts whatever value reaches its input buffers and applies deterministic logic to it with
+      absolute confidence. And when those upstream signals are manipulated — whether sensor readings, timing
+      references, or permissive bits — the controller's logic becomes the attack surface.
+    </p>
+    <p>
+      In Part 2 of this series (building on the BSides Delaware presentation), we explored how industrial systems
+      trust external signals that were never designed for contested environments: GNSS timing, power system
+      telemetry, and navigation signals with no integrity controls. Now, in Part 3, we move downstream — into
+      the controller itself — to expose why a single falsified input can trigger state transitions, bypass
+      interlocks, destabilize PID loops, or issue dangerous physical commands.
+    </p>
+
+    <h2>Why PLC Logic Is Fragile When Inputs Are Manipulated</h2>
+    <p>PLCs operate on a small set of truths:</p>
+
+    <div class="plc-logic">
+      <span class="plc-label">// PLC EVALUATION MODEL</span>
+      <span class="plc-line">IF rung condition is met       → evaluate next instruction</span>
+      <span class="plc-line">IF permissive is true          → enable the sequence</span>
+      <span class="plc-line">IF timer expires               → advance to next state</span>
+      <span class="plc-line">IF value crosses threshold     → activate output</span>
+      <span class="plc-missing">// NOTICE WHAT'S MISSING:</span>
+      <span class="plc-missing-item">✗  "Does this value make physical sense?"</span>
+      <span class="plc-missing-item">✗  "Is this sensor behaving consistently with others?"</span>
+      <span class="plc-missing-item">✗  "Did this input change too quickly to be real?"</span>
+    </div>
+
+    <div class="callout callout-red">
+      <p>There is no truth verification inside the controller. A manipulated input becomes a manipulated state — and the controller reacts with deterministic certainty, even if the reaction is hazardous.</p>
+    </div>
+
+    <h2>Three Failure Modes When Inputs Are Manipulated</h2>
+
+    <div class="failure-block">
+      <div class="failure-num">// FAILURE MODE 01</div>
+      <h3>Forced State Transitions</h3>
+      <p>A spoofed sensor value crosses a threshold that the physical system never reached. The state machine changes — and no alarms trigger, because every downstream rung evaluates normally.</p>
+      <ul>
+        <li>Falsified temperature drops 180°F → 85°F: heater activates, overheating the process</li>
+        <li>Manipulated tank sensor reads "low level": pump starts, causing cavitation or dry-run damage</li>
+        <li>Falsified pressure shows "safe": safety interlock bypassed, dangerous sequence initiates</li>
+      </ul>
+      <p class="failure-italic">One manipulated value changes everything downstream.</p>
+    </div>
+
+    <div class="failure-block">
+      <div class="failure-num">// FAILURE MODE 02</div>
+      <h3>Logic Pollution</h3>
+      <p>The most underrated ICS attack class. An attacker changes a single upstream value — a bit, a counter, a mode flag, a timer preset, a permissive — and that corrupted value propagates through:</p>
+      <ul>
+        <li>Latching coils and safety rails</li>
+        <li>Step sequences and PID controllers</li>
+        <li>Startup interlocks and permissive chains</li>
+      </ul>
+      <p class="failure-italic">This is not a single control failure — this is logical corruption that propagates like a toxin.</p>
+    </div>
+
+    <div class="failure-block">
+      <div class="failure-num">// FAILURE MODE 03</div>
+      <h3>Timing Desynchronization</h3>
+      <p>Timing attacks are the silent killers of industrial logic. Most ICS environments rely on GNSS or NTP for synchrophasor alignment, breaker coordination, relay comparison logic, event sequencing, and protection logic ordering.</p>
+      <p>When an attacker spoofs or shifts timing — no malware, no firmware modification, no protocol injection needed. The system is simply confused.</p>
+      <ul>
+        <li>Relays misfire</li>
+        <li>Interlocks expire too early or too late</li>
+        <li>Controllers advance steps out of order</li>
+      </ul>
+      <p class="failure-italic">The system still "runs" — but not safely.</p>
+    </div>
+
+    <h2>Real-World Attack Scenarios</h2>
+
+    <div class="scenario-block">
+      <div class="scenario-num">// SCENARIO 01</div>
+      <h4>RTU Desynchronization → Breaker Trips at the Wrong Time</h4>
+      <p>Grid protection relays depend on tightly synchronized phasors. Spoof GNSS timing and you poison the foundation of grid coordination. A few microseconds of timing drift can cascade into a grid event.</p>
+      <ul>
+        <li>False breaker openings or failure to trip when needed</li>
+        <li>Out-of-phase switching across substations</li>
+        <li>Incorrect relay comparisons and protection misalignment</li>
+      </ul>
+    </div>
+
+    <div class="scenario-block">
+      <div class="scenario-num">// SCENARIO 02</div>
+      <h4>Forced Permissive → Safety Interlock Bypassed</h4>
+      <p>Safety sequences rely on permissives: tank must be full, valve must be closed, pressure must be stable. If an attacker flips one bit, the PLC sees a safe condition that does not exist — and proceeds with complete confidence.</p>
+      <ul>
+        <li>Startup, shutdown, pressurization, chemical dosing</li>
+        <li>Heating cycles and mechanical actuation</li>
+        <li>All initiated against a physical state the system cannot see</li>
+      </ul>
+    </div>
+
+    <div class="scenario-block">
+      <div class="scenario-num">// SCENARIO 03</div>
+      <h4>PID Loop Instability Through Sensor Drift</h4>
+      <p>PID loops trust input values completely. If an attacker gradually spoofs a sensor, the loop tries to correct a problem that isn't there — outputs oscillate, actuators hunt, processes destabilize, equipment is stressed or damaged.</p>
+      <p><strong>The most dangerous pattern:</strong> operators interpret the instability as a mechanical issue, not an adversarial one. The attack hides behind normal-looking system behavior.</p>
+    </div>
+
+    <h2>Why Defenders Miss These Attack Paths</h2>
+    <p>Most ICS security programs focus on the right things — but not sufficient things:</p>
+
+    <div class="defender-gap">
+      <span class="label">// WHAT DEFENDERS TYPICALLY COVER</span>
+      <ul>
+        <li>Patch management</li>
+        <li>Firmware integrity</li>
+        <li>Secure configuration</li>
+        <li>Network segmentation</li>
+        <li>Logging &amp; monitoring</li>
+        <li>Protocol inspection</li>
+        <li>Firewalls &amp; allowlists</li>
+      </ul>
+      <p class="gap-note">
+        These frameworks treat the signal layer as "trusted infrastructure, not an attack surface." Defenders focus on the network, controller, and HMI layers — but not the most manipulable layer of all: <strong style="color:#fff">the inputs themselves.</strong>
+      </p>
+    </div>
+
+    <h2>Why This Problem Is So Fundamental</h2>
+    <p>Because the control system is not the victim. <strong>Reality is the victim.</strong></p>
+    <p>When attackers manipulate inputs:</p>
+
+    <div class="insight-block">
+      <span class="label">// THE CORE INSIGHT</span>
+      <p>The PLC is not hacked. The RTU is not compromised.<br>The HMI is not infected. The historian is not altered.</p>
+      <p>The process is manipulated through logic behaving exactly as designed.</p>
+    </div>
+
+    <p>
+      This is what makes signal-layer attacks so effective — and so hard to defend against.
+      Because the attacker doesn't need to exploit the controller. They just need to lie convincingly.
+    </p>
+
+    <h2>Coming Next: Detection Strategies (Part 4)</h2>
+    <p>In Part 4, we'll explore detection techniques that reveal the gap between perceived state and physical reality — techniques most industrial security programs overlook:</p>
+
+    <div class="preview-block">
+      <span class="label">// PART 4 PREVIEW — DETECTING LOGIC-LEVEL LIES</span>
+      <h4>Physics-Based Detection &amp; Signal Verification</h4>
+      <ul class="preview-list">
+        <li>Physics-Based Anomaly Detection</li>
+        <li>Sensor Redundancy &amp; Signal Correlation</li>
+        <li>Timing Drift Detection</li>
+        <li>State-Machine Integrity Monitoring</li>
+        <li>Scan-Cycle Stability Monitoring</li>
+      </ul>
+    </div>
+
+    <!-- Closing -->
+    <div class="closing-block">
+      <p>Every industrial cyberattack begins with the same principle: <em>"If you can control what the system sees, you can control what it does."</em></p>
+      <p>PLCs and RTUs don't validate truth — they only evaluate inputs. This makes the signal layer one of the easiest, most cost-effective targets for adversaries, yet one of the least defended.</p>
+      <p>In an era where operational environments are increasingly contested, defenders must stop treating sensors, permissives, and external timing as trusted infrastructure.</p>
+      <p class="verdict">Because logic follows lies. And in ICS environments, lies can break the physical world.</p>
+    </div>
+
+    <p style="margin-top:2rem;">If you work in grid protection, pipeline control, water and wastewater, manufacturing automation, chemical processing, or SCADA/ICS engineering — I'd welcome your perspective on the detection challenges you face in your environment.</p>
+
+    <div class="sector-list">
+      <span class="sector-tag">GRID PROTECTION</span>
+      <span class="sector-tag">PIPELINE CONTROL</span>
+      <span class="sector-tag">WATER &amp; WASTEWATER</span>
+      <span class="sector-tag">MANUFACTURING</span>
+      <span class="sector-tag">CHEMICAL PROCESSING</span>
+      <span class="sector-tag">SCADA/ICS</span>
+    </div>
+
+    <div class="article-divider">── ◈ ──</div>
+
+    <div class="author-bio">
+      <div class="bio-initials">NC</div>
+      <div class="bio-text">
+        <div class="bio-name">Norris Cornell</div>
+        <p>Technical Lead for Identity &amp; Access Management in the financial sector, with nearly 20 years as an electronics technician and a Master's degree in SCADA Cybersecurity from Wilmington University. Previously held DoD Secret clearance. Research focuses on ICS/OT signal integrity, physical-layer attack vectors, and critical infrastructure defense. BSides Delaware organizer and volunteer since 2015.</p>
+      </div>
+    </div>
+
+    <div style="margin-top:2rem; padding:1rem 1.25rem; border:1px solid var(--border); border-radius:var(--radius); background:rgba(255,255,255,0.02);">
+      <p style="font-family:var(--font-mono); font-size:0.7rem; color:var(--text-muted); margin:0; line-height:1.7; letter-spacing:0.04em;">
+        © 2024 Norris Cornell. All Rights Reserved. This article is the original intellectual property of Norris Cornell.
+        No portion may be reproduced, republished, or redistributed in any form without prior written permission.
+        For licensing or citation inquiries, <a href="../contact.html">contact here</a>.
+      </p>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">CORNELL <span>SECURITY</span></div>
+    <div class="footer-copy">© 2026 NORRIS CORNELL · ALL RIGHTS RESERVED</div>
+  </div>
+  <div class="footer-legal">
+    All content, research, frameworks, and written works published on this site are the intellectual property of Norris Cornell
+    and are protected by copyright. Reproduction, redistribution, or use in any form without prior written permission is prohibited.
+  </div>
+</footer>
+
+</body>
+</html>

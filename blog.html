@@ -51,47 +51,138 @@
 
       <div class="post-list">
 
-        <a href="blog/draft-article-02-25-2026.html" style="text-decoration:none;">
+        <a href="blog/logic-follows-lies-plc-rtu.html" style="text-decoration:none;">
           <div class="post-item">
             <div>
-              <div class="post-meta">FEBRUARY 25, 2026 · ANALYSIS</div>
-              <h3>Draft Article — February 25, 2026</h3>
-              <p>Field analysis and commentary — current working draft. Check back for the published version.</p>
+              <div class="post-meta">ICS/OT · PLC/RTU · SIGNAL INTEGRITY · BSIDES SERIES PT.3</div>
+              <h3>Logic Follows Lies: How PLCs and RTUs Fail Under Adversarial Conditions</h3>
+              <p>PLCs don't validate truth — they evaluate inputs. When those inputs are manipulated, deterministic logic becomes the attack surface. Forced state transitions, logic pollution, and timing desynchronization explained.</p>
             </div>
-            <span class="post-badge badge-draft">DRAFT</span>
+            <span class="post-badge badge-blog">SERIES</span>
+          </div>
+        </a>
+
+        <a href="blog/inputs-lie-trusted-signals.html" style="text-decoration:none;">
+          <div class="post-item">
+            <div>
+              <div class="post-meta">ICS/OT · PHYSICAL-LAYER · SIGNAL INTEGRITY · BSIDES SERIES PT.2</div>
+              <h3>Inputs Lie: Your System Trusts Signals It Shouldn't</h3>
+              <p>Every control loop starts before the PLC. The real attack surface begins at the sensor — and the trust assumptions baked into legacy infrastructure make signal-layer manipulation invisible to conventional security monitoring.</p>
+            </div>
+            <span class="post-badge badge-blog">SERIES</span>
+          </div>
+        </a>
+
+        <a href="blog/ics-input-validation-owasp.html" style="text-decoration:none;">
+          <div class="post-item">
+            <div>
+              <div class="post-meta">APPSEC · ICS/OT · INPUT VALIDATION · SERIES PT.1</div>
+              <h3>ICS Taught Me More About Input Validation Than OWASP Ever Did</h3>
+              <p>The same failures that broke MOVEit have been plaguing ICS environments for decades. They just look different — and the blast radius is physical, not digital.</p>
+            </div>
+            <span class="post-badge badge-blog">SERIES</span>
+          </div>
+        </a>
+
+        <a href="blog/aliquippa-water-sector-default-passwords.html" style="text-decoration:none;">
+          <div class="post-item">
+            <div>
+              <div class="post-meta">2023 · ICS/OT · WATER SECTOR · CRITICAL INFRASTRUCTURE</div>
+              <h3>The Water Sector's Default Password Problem</h3>
+              <p>The Aliquippa incident wasn't sophisticated. A default password, a Shodan scan, and implicit trust handed a water utility serving 6,000 people to an Iranian IRGC-affiliated threat actor.</p>
+            </div>
+            <span class="post-badge badge-blog">ARTICLE</span>
+          </div>
+        </a>
+
+        <a href="blog/salt-typhoon-inputs-lie.html" style="text-decoration:none;">
+          <div class="post-item">
+            <div>
+              <div class="post-meta">DECEMBER 2024 · IAM · SCADA CYBERSECURITY · INPUTS LIE SERIES PT.1</div>
+              <h3>Salt Typhoon and the "Inputs Lie" Pattern: How Chinese APTs Exploited a Systemic Trust Failure Across Critical Infrastructure</h3>
+              <p>How Chinese state-sponsored actors stayed undetected in U.S. telecoms for over a year — and what it reveals about a trust failure that runs through every sector of critical infrastructure.</p>
+            </div>
+            <span class="post-badge badge-blog">ARTICLE</span>
+          </div>
+        </a>
+
+        <a href="blog/signal-manipulation-ics.html" style="text-decoration:none;">
+          <div class="post-item">
+            <div>
+              <div class="post-meta">ICS/OT SECURITY · PHYSICAL-LAYER ATTACKS</div>
+              <h3>Signal Manipulation in Industrial Control Systems: Why Traditional Security Fails at the Physics Layer</h3>
+              <p>Harmonic injection, amplitude manipulation, GPS timing attacks, and the fundamental blind spot that firewalls, encryption, and IDS were never designed to solve.</p>
+            </div>
+            <span class="post-badge badge-blog">ARTICLE</span>
+          </div>
+        </a>
+
+        <a href="blog/scada-brain-behind-industrial-systems.html" style="text-decoration:none;">
+          <div class="post-item">
+            <div>
+              <div class="post-meta">MARCH 2025 · ICS/OT FUNDAMENTALS · SCADA · CRITICAL INFRASTRUCTURE</div>
+              <h3>SCADA: The Brain Behind Industrial Systems</h3>
+              <p>A foundational guide to SCADA using the brain-body analogy. How HMIs, PLCs, RTUs, sensors, and actuators coordinate like a nervous system — and why Stuxnet proved that compromising that system means controlling the physical world.</p>
+            </div>
+            <span class="post-badge badge-blog">ARTICLE</span>
+          </div>
+        </a>
+
+        <a href="blog/cyber-defense-dev-environment.html" style="text-decoration:none;">
+          <div class="post-item">
+            <div>
+              <div class="post-meta">BLUE TEAM · LAB SETUP · PYTHON · NETWORK SECURITY</div>
+              <h3>Building a Cyber Defense Development Environment in a Virtual Machine</h3>
+              <p>Step-by-step: Ubuntu XFCE VM, isolated Python environments, ping discovery, ARP scanning with Scapy, hostname resolution, and timestamped logging. The foundation for an AI-driven blue-team SOC lab.</p>
+            </div>
+            <span class="post-badge badge-blog">HANDS-ON</span>
+          </div>
+        </a>
+
+        <a href="blog/ot-asset-visibility.html" style="text-decoration:none;">
+          <div class="post-item">
+            <div>
+              <div class="post-meta">ICS/OT · ASSET MANAGEMENT · FUNDAMENTALS · CRITICAL INFRASTRUCTURE</div>
+              <h3>Asset Visibility in OT Environments: Why You Can't Defend What You Don't See</h3>
+              <p>Passive discovery, OT-safe inventory practices, and rogue device detection. Why the Colonial Pipeline shutdown was ultimately a visibility failure — and what defenders can do about it.</p>
+            </div>
+            <span class="post-badge badge-blog">ARTICLE</span>
           </div>
         </a>
 
         <a href="blog/when-cyber-meets-the-spectrum.html" style="text-decoration:none;">
           <div class="post-item">
             <div>
-              <div class="post-meta">BSIDES DELAWARE · PRESENTATION RECAP</div>
-              <h3>When Cyber Meets the Spectrum</h3>
-              <p>A recap of the BSides Delaware presentation on the convergence of SIGINT, satellite cybersecurity, and ICS/OT attack surfaces. What defenders miss when they only look at the network.</p>
+              <div class="post-meta">NOVEMBER 2025 · BSIDES DELAWARE · SATELLITE SECURITY · SIGINT · CRITICAL INFRASTRUCTURE</div>
+              <h3>Satellite Cybersecurity: When Cyber Meets the Spectrum</h3>
+              <p>How SIGINT, ICS, and application security converge in the invisible domain we depend on. GPS spoofing, the 2022 Viasat attack, and why your firewalls don't reach the RF layer. Presented at BSides Delaware 2025.</p>
             </div>
             <span class="post-badge badge-blog">PRESENTATION</span>
           </div>
         </a>
 
-        <a href="blog/why-inputs-lie.html" style="text-decoration:none;">
+        <a href="blog/cyber-hygiene-101.html" style="text-decoration:none;">
           <div class="post-item">
             <div>
-              <div class="post-meta">2026 · INTRODUCTORY POST</div>
-              <h3>Why Inputs Lie — An Introduction to the Framework</h3>
-              <p>A plain-language introduction to the core argument: that ICS security models have a structural vulnerability baked into their fundamental assumptions about input trustworthiness.</p>
+              <div class="post-meta">FUNDAMENTALS · NIST SP 800-53 · IAM · BLUE TEAM</div>
+              <h3>Cyber Hygiene 101: What NIST Says About Keeping Your Digital Footprint Clean</h3>
+              <p>MFA, strong passwords, patching, and secure configurations aren't optional — they're survival. The MGM $100M breach proves what happens when basic hygiene fails, and NIST SP 800-53 tells us exactly how to fix it.</p>
             </div>
             <span class="post-badge badge-blog">ARTICLE</span>
           </div>
         </a>
 
-      </div>
+        <a href="blog/critical-infrastructure-what-it-is.html" style="text-decoration:none;">
+          <div class="post-item">
+            <div>
+              <div class="post-meta">FOUNDATIONS · CRITICAL INFRASTRUCTURE · PUBLIC AWARENESS</div>
+              <h3>Critical Infrastructure: What It Is &amp; Why You Should Care</h3>
+              <p>From your morning coffee to your evening commute, critical infrastructure touches every hour of your day. A plain-language introduction to all 16 sectors, the Texas power crisis, WannaCry, and why protection of these systems is everyone's concern.</p>
+            </div>
+            <span class="post-badge badge-blog">ARTICLE</span>
+          </div>
+        </a>
 
-      <!-- Add more posts above this line -->
-
-      <div class="mt-3" style="text-align:center; padding:2rem; border:1px dashed var(--border); border-radius:var(--radius);">
-        <p style="font-family:var(--font-mono); font-size:0.75rem; color:var(--text-muted); letter-spacing:0.1em;">
-          // MORE POSTS COMING — CHECK BACK SOON
-        </p>
       </div>
 
     </div>

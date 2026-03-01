@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inputs Lie: Your System Trusts Signals It Shouldn't — Cornell Security</title>
+  <meta name="description" content="Every control loop starts with a trusted signal. What happens when that trust is misplaced? The foundational argument for threat-modeling external signals in ICS/OT environments.">
+  <meta name="author" content="Norris Cornell">
+  <meta name="copyright" content="© 2024 Norris Cornell. All Rights Reserved.">
+  <link rel="canonical" href="https://cornellsecurity.com/blog/inputs-lie-trusted-signals.html">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .article-wrapper { max-width: 800px; margin: 0 auto; padding: 3rem 2rem 5rem; }
+    .article-header { margin-bottom: 3rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
+    .article-header h1 { font-family: var(--font-heading); font-size: clamp(1.7rem, 3.2vw, 2.4rem); font-weight: 700; color: #fff; line-height: 1.2; letter-spacing: 0.03em; margin-bottom: 1.25rem; }
+    .article-meta { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; margin-bottom: 0.75rem; }
+    .article-meta span { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); letter-spacing: 0.1em; }
+    .article-meta .meta-author { color: var(--accent-cyan); }
+    .series-badge { display: inline-block; font-family: var(--font-mono); font-size: 0.68rem; color: var(--accent-green); background: rgba(0,255,159,0.08); border: 1px solid rgba(0,255,159,0.2); padding: 0.3rem 0.75rem; border-radius: var(--radius); letter-spacing: 0.12em; margin-bottom: 1rem; }
+
+    .article-body h2 { font-family: var(--font-heading); font-size: 1.45rem; font-weight: 700; color: #fff; letter-spacing: 0.04em; margin: 2.75rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+    .article-body h3 { font-family: var(--font-heading); font-size: 1.05rem; font-weight: 600; color: var(--accent-cyan); letter-spacing: 0.06em; margin: 1.75rem 0 0.6rem; }
+    .article-body p { color: var(--text-secondary); font-size: 0.98rem; line-height: 1.85; margin-bottom: 1.15rem; }
+    .article-body strong { color: var(--text-primary); font-weight: 600; }
+    .article-body ul { color: var(--text-secondary); font-size: 0.97rem; line-height: 1.85; padding-left: 1.5rem; margin-bottom: 1.25rem; }
+    .article-body ul li { margin-bottom: 0.5rem; }
+
+    /* Opening hook block */
+    .hook-block {
+      background: var(--bg-deep);
+      border: 1px solid var(--border-accent);
+      border-radius: var(--radius);
+      padding: 2.25rem 2rem;
+      margin-bottom: 2.5rem;
+      text-align: center;
+    }
+    .hook-block .hook-statement {
+      font-family: var(--font-heading);
+      font-size: clamp(1.35rem, 3vw, 1.9rem);
+      font-weight: 700;
+      color: var(--accent-cyan);
+      letter-spacing: 0.04em;
+      line-height: 1.35;
+      margin-bottom: 1rem;
+      display: block;
+    }
+    .hook-block p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.75;
+      margin: 0;
+    }
+
+    /* Callouts */
+    .callout { background: rgba(0,212,255,0.05); border-left: 3px solid var(--accent-cyan); padding: 1rem 1.25rem; margin: 1.75rem 0; border-radius: 0 var(--radius) var(--radius) 0; }
+    .callout p { margin: 0; color: var(--text-primary); font-size: 1.02rem; font-style: italic; line-height: 1.7; }
+    .callout-red { border-left-color: var(--accent-red); background: rgba(255,71,87,0.05); }
+    .callout-green { border-left-color: var(--accent-green); background: rgba(0,255,159,0.05); }
+    .callout-yellow { border-left-color: #f5a623; background: rgba(245,166,35,0.05); }
+
+    /* Trust chain diagram */
+    .trust-chain {
+      background: #020508;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+      margin: 1.75rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+    }
+    .trust-chain .chain-label { color: var(--accent-cyan); font-size: 0.7rem; letter-spacing: 0.15em; display: block; margin-bottom: 1.25rem; }
+    .trust-chain .chain-step { display: flex; align-items: flex-start; gap: 1rem; padding: 0.6rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .trust-chain .chain-step:last-child { border-bottom: none; }
+    .trust-chain .step-num { color: var(--accent-cyan); min-width: 2rem; font-size: 0.78rem; }
+    .trust-chain .step-node { color: #fff; flex: 1; }
+    .trust-chain .step-arrow { color: var(--accent-green); }
+    .trust-chain .step-trust { color: var(--accent-red); font-size: 0.75rem; margin-top: 0.2rem; display: block; }
+
+    /* Attack fingerprints */
+    .fingerprint-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1.75rem 0;
+    }
+    @media (max-width: 600px) { .fingerprint-grid { grid-template-columns: 1fr; } }
+    .fingerprint-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+    }
+    .fingerprint-card .fp-label {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--accent-red);
+      letter-spacing: 0.12em;
+      display: block;
+      margin-bottom: 0.65rem;
+    }
+    .fingerprint-card h4 {
+      font-family: var(--font-heading);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.5rem;
+    }
+    .fingerprint-card p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+      margin: 0;
+    }
+
+    /* Gap table */
+    .gap-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.75rem 0;
+      font-size: 0.88rem;
+    }
+    .gap-table th {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      text-align: left;
+      padding: 0.6rem 0.9rem;
+      background: var(--bg-deep);
+      border-bottom: 1px solid var(--border-accent);
+    }
+    .gap-table td {
+      padding: 0.7rem 0.9rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-secondary);
+      vertical-align: top;
+    }
+    .gap-table tr:last-child td { border-bottom: none; }
+    .gap-table .td-label { color: var(--accent-cyan); font-family: var(--font-mono); font-size: 0.8rem; font-weight: 600; }
+    .gap-table .td-gap { color: var(--accent-red); }
+    .gap-table .td-why { color: var(--text-secondary); }
+
+    /* Framework pillars */
+    .pillars { display: flex; flex-direction: column; gap: 1rem; margin: 1.75rem 0; }
+    .pillar {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent-cyan);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      padding: 1.25rem 1.5rem;
+    }
+    .pillar.red-border { border-left-color: var(--accent-red); }
+    .pillar.green-border { border-left-color: var(--accent-green); }
+    .pillar .pillar-num {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--accent-cyan);
+      letter-spacing: 0.15em;
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+    .pillar.red-border .pillar-num { color: var(--accent-red); }
+    .pillar.green-border .pillar-num { color: var(--accent-green); }
+    .pillar h4 {
+      font-family: var(--font-heading);
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.5rem;
+    }
+    .pillar p { font-size: 0.92rem; color: var(--text-secondary); line-height: 1.7; margin: 0; }
+
+    /* Closing verdict */
+    .verdict-block {
+      background: var(--bg-deep);
+      border: 1px solid var(--border-accent);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin: 2.5rem 0;
+      text-align: center;
+    }
+    .verdict-block .verdict-text {
+      font-family: var(--font-heading);
+      font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.04em;
+      line-height: 1.4;
+      margin-bottom: 0.75rem;
+    }
+    .verdict-block p { color: var(--text-muted); font-size: 0.88rem; margin: 0; }
+
+    /* Next post preview */
+    .next-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-top: 3rem;
+    }
+    .next-card .next-label { font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-muted); letter-spacing: 0.12em; display: block; margin-bottom: 0.75rem; }
+    .next-card h3 { font-family: var(--font-heading); font-size: 1.1rem; font-weight: 700; color: var(--accent-cyan); margin-bottom: 0.5rem; }
+    .next-card p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.65; margin-bottom: 1rem; }
+    .next-card a.btn { display: inline-block; }
+
+    /* Author bio */
+    .author-bio {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-top: 2.5rem;
+      display: flex;
+      gap: 1.25rem;
+      align-items: flex-start;
+    }
+    .author-bio .bio-initials {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      background: rgba(0,212,255,0.08);
+      border: 1px solid rgba(0,212,255,0.2);
+      border-radius: 50%;
+      width: 48px; height: 48px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .author-bio .bio-text h4 { font-family: var(--font-heading); font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 0.3rem; }
+    .author-bio .bio-text p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.65; margin: 0; }
+
+    /* Copyright */
+    .article-copyright {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+    .back-link { display: inline-block; font-family: var(--font-mono); font-size: 0.78rem; color: var(--accent-cyan); text-decoration: none; letter-spacing: 0.08em; margin-bottom: 2rem; }
+    .back-link:hover { color: #fff; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-container">
+    <a href="../index.html" class="nav-brand">
+      <span class="brand-icon">◈</span>
+      <span>CORNELL <span class="brand-accent">SECURITY</span></span>
+    </a>
+    <div class="nav-links" id="navLinks">
+      <a href="../about.html">ABOUT</a>
+      <a href="../research.html">RESEARCH</a>
+      <a href="../blog.html" class="active">BLOG</a>
+      <a href="../contact.html">CONTACT</a>
+    </div>
+    <button class="nav-toggle" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
+  </div>
+</nav>
+
+<div class="page-wrapper">
+  <article class="article-wrapper">
+
+    <a href="../blog.html" class="back-link">← BACK TO BLOG</a>
+
+    <header class="article-header">
+      <span class="series-badge">BSides Delaware Series · Part 2 of 4</span>
+      <h1>Inputs Lie: Your System Trusts Signals It Shouldn't</h1>
+      <div class="article-meta">
+        <span class="meta-author">Norris Cornell</span>
+        <span>·</span>
+        <span>2024</span>
+        <span>·</span>
+        <span>ICS / OT Security</span>
+        <span>·</span>
+        <span>Physical-Layer</span>
+      </div>
+    </header>
+
+    <div class="article-body">
+
+      <!-- Hook -->
+      <div class="hook-block">
+        <span class="hook-statement">Every control loop starts before the PLC.</span>
+        <p>Somewhere upstream, a sensor is measuring something real — temperature, pressure, flow, position. That measurement becomes a signal. That signal becomes a value. That value becomes a decision. And nowhere in that chain does the system ask: <em>is this signal telling the truth?</em></p>
+      </div>
+
+      <p>This is not a theoretical vulnerability. It is the structural condition of industrial control systems as they exist today — in water treatment plants, power substations, oil pipelines, and manufacturing floors. The control loop is designed to act on inputs. The security architecture is designed to protect the network. And the gap between those two things is where sophisticated adversaries are operating right now.</p>
+
+      <p>The "Inputs Lie" framework starts here: with the recognition that the real starting point of every industrial process is not software, not firmware, not protocol — it is a physical signal that the system has decided to trust unconditionally.</p>
+
+      <h2>The Control Loop Starts Before You Think It Does</h2>
+
+      <p>Most ICS security practitioners think about the attack surface in terms of networks, protocols, and devices. Modbus is unauthenticated. DNP3 has known weaknesses. The HMI is exposed. These are real problems. But they are not the beginning of the chain — they are somewhere in the middle.</p>
+
+      <p>The actual beginning looks like this:</p>
+
+      <div class="trust-chain">
+        <span class="chain-label">// INDUSTRIAL CONTROL LOOP — SIGNAL TRUST CHAIN</span>
+        <div class="chain-step">
+          <span class="step-num">01</span>
+          <div class="step-node">
+            <strong>Physical world event</strong> — a valve opens, a tank fills, a motor spins
+            <span class="step-trust">⚡ No security consideration exists at this layer</span>
+          </div>
+        </div>
+        <div class="chain-step">
+          <span class="step-num">02</span>
+          <div class="step-node">
+            <strong>Sensor measurement</strong> — transducer converts physical state to electrical signal
+            <span class="step-trust">⚡ Signal integrity assumed, not verified</span>
+          </div>
+        </div>
+        <div class="chain-step">
+          <span class="step-num">03</span>
+          <div class="step-node">
+            <strong>Signal transmission</strong> — analog or digital signal travels over wiring or RF
+            <span class="step-trust">⚡ Transmission path is typically unmonitored</span>
+          </div>
+        </div>
+        <div class="chain-step">
+          <span class="step-num">04</span>
+          <div class="step-node">
+            <strong>Input module / RTU</strong> — signal digitized and passed to PLC
+            <span class="step-trust">⚡ Value accepted as ground truth</span>
+          </div>
+        </div>
+        <div class="chain-step">
+          <span class="step-num">05</span>
+          <div class="step-node">
+            <strong>PLC logic evaluation</strong> — deterministic program executes based on received value
+            <span class="step-trust">⚡ Logic is sound. The premise it operates on may not be.</span>
+          </div>
+        </div>
+        <div class="chain-step">
+          <span class="step-num">06</span>
+          <div class="step-node">
+            <strong>Physical actuation</strong> — output commands change state of the real world
+            <span class="step-trust">⚡ Consequence delivered. No rollback possible.</span>
+          </div>
+        </div>
+      </div>
+
+      <p>The security community spends most of its attention on steps four and five — the digital domain. But steps one through three are where an adversary with patience, resources, and physical access can introduce manipulated data that travels faithfully through every subsequent layer, never triggering a single alert.</p>
+
+      <div class="callout">
+        <p>"The PLC is doing exactly what it was designed to do. The problem is what it was designed to do with." </p>
+      </div>
+
+      <h2>Why Digital Logic Cannot Verify Physical Truth</h2>
+
+      <p>There is a seductive assumption embedded in how most engineers think about PLCs: because the logic is deterministic, the output is reliable. If the program is correct, the system behaves correctly. This is true in isolation. It is false in an adversarial environment.</p>
+
+      <p>Deterministic logic operates on the premise that its inputs accurately represent the physical world. That premise is never verified. It cannot be verified — at least not from within the control system itself. The PLC has no independent ground truth. It knows only what its sensors tell it, processed through whatever signal conditioning exists in the input modules.</p>
+
+      <p>This creates a structural vulnerability: <strong>an adversary who controls what the sensor reports controls what the PLC decides.</strong></p>
+
+      <p>They do not need to compromise the PLC. They do not need to bypass the firewall. They do not need to exploit a protocol vulnerability. They need to make the sensor lie — consistently, plausibly, within operational parameters — and the deterministic logic does the rest for them.</p>
+
+      <h2>The Gap Exists Because of How Legacy Systems Were Built</h2>
+
+      <p>It is worth being precise about why this gap exists, because understanding its origin is necessary to understand why it persists.</p>
+
+      <p>Industrial control systems were not designed for adversarial environments. They were designed for reliability and uptime in environments where the threat model was component failure, not intentional manipulation. Sensor validation, where it existed at all, was designed to detect hardware faults — a wire breaking, a sensor going out of range, a value stuck at zero. It was not designed to detect a sophisticated adversary deliberately keeping a value within plausible bounds while causing gradual drift toward a dangerous state.</p>
+
+      <div class="callout callout-yellow">
+        <p>The difference between a hardware fault and a sophisticated signal attack is intentionality. One produces values that look broken. The other produces values that look normal — until the process crosses a threshold that cannot be recovered.</p>
+      </div>
+
+      <p>The legacy of this design approach is infrastructure that was installed decades ago, will remain in service for decades more, and cannot be replaced wholesale without disrupting the processes it controls. Patching this gap requires adding validation where none was designed to exist — which is architecturally difficult and operationally risky in environments where downtime has immediate physical consequences.</p>
+
+      <h2>What Signal-Layer Attacks Look Like</h2>
+
+      <p>Because signal-layer manipulation is designed to stay below detection thresholds, it does not produce the obvious indicators that network-based attacks do. There are no error logs. No anomalous connections. No authentication failures. What it does produce are subtle fingerprints that, in hindsight, were always present.</p>
+
+      <div class="fingerprint-grid">
+        <div class="fingerprint-card">
+          <span class="fp-label">FINGERPRINT · 01</span>
+          <h4>Gradual Drift</h4>
+          <p>Sensor values move incrementally over hours or days — each individual reading within plausible bounds, but collectively representing a trajectory the process should never follow.</p>
+        </div>
+        <div class="fingerprint-card">
+          <span class="fp-label">FINGERPRINT · 02</span>
+          <h4>Cross-Sensor Disagreement</h4>
+          <p>Redundant sensors measuring the same physical parameter begin diverging without a physical explanation. One is measuring reality. The other may not be.</p>
+        </div>
+        <div class="fingerprint-card">
+          <span class="fp-label">FINGERPRINT · 03</span>
+          <h4>Timing Anomalies</h4>
+          <p>Control sequences that should be synchronized begin falling out of phase. Events that should trigger together begin decoupling — particularly relevant when GNSS timing is involved.</p>
+        </div>
+        <div class="fingerprint-card">
+          <span class="fp-label">FINGERPRINT · 04</span>
+          <h4>Implausible Quiescence</h4>
+          <p>A sensor that should vary with process conditions begins reporting an unusually stable value. Stability is normally desirable — but artificially stable signals are a red flag.</p>
+        </div>
+      </div>
+
+      <p>None of these individually are definitive. Sensors drift. Redundant sensors disagree for legitimate reasons. This is precisely what makes signal-layer attacks effective against conventional detection: the same signatures appear in normal equipment aging and in deliberate manipulation. Distinguishing between them requires cross-sensor correlation, process physics modeling, and pattern analysis over time — capabilities that most OT environments simply do not have deployed today.</p>
+
+      <h2>The Framework Gap: Where Current Security Falls Short</h2>
+
+      <p>MITRE ATT&CK for ICS represents the most mature public framework for mapping adversary behavior in industrial environments. It is useful, important, and incomplete. What it describes well is behavior at and above the device layer — techniques like "Modify Control Logic," "Block Reporting Message," and "Spoof Reporting Message." What it addresses less directly is the physical-layer manipulation that precedes all of that.</p>
+
+      <table class="gap-table">
+        <thead>
+          <tr>
+            <th>SECURITY LAYER</th>
+            <th>WHAT IT COVERS</th>
+            <th>WHAT IT MISSES</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-label">Network Security</td>
+            <td>Unauthorized connections, protocol anomalies, lateral movement</td>
+            <td class="td-gap">Attacks that never touch the network</td>
+          </tr>
+          <tr>
+            <td class="td-label">Endpoint Security</td>
+            <td>Malware, unauthorized software, configuration drift</td>
+            <td class="td-gap">Compromised inputs that make clean endpoints do bad things</td>
+          </tr>
+          <tr>
+            <td class="td-label">Protocol Monitoring</td>
+            <td>Anomalous commands, unauthorized writes, message injection</td>
+            <td class="td-gap">Legitimate commands issued in response to false sensor data</td>
+          </tr>
+          <tr>
+            <td class="td-label">SIEM / SOAR</td>
+            <td>Log aggregation, alert correlation, incident response</td>
+            <td class="td-gap">Physical-layer events that produce no logs</td>
+          </tr>
+          <tr>
+            <td class="td-label">Process Monitoring</td>
+            <td>Known alarm setpoints, operator-defined thresholds</td>
+            <td class="td-gap">Sub-threshold manipulation designed to stay within alarm bounds</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>The gap is not a failure of any of these tools. Each does what it was designed to do. The gap exists because the threat model that justified their design did not include adversaries operating at the physical layer. That threat model is no longer adequate.</p>
+
+      <h2>What "Inputs Lie" Requires of Defenders</h2>
+
+      <p>Closing this gap is not a product purchase. It is an architectural and analytical posture — a deliberate decision to treat external signals as untrusted until they can be corroborated. In practice, this means building defenses that operate at and below the device layer.</p>
+
+      <div class="pillars">
+        <div class="pillar">
+          <span class="pillar-num">PRINCIPLE 01</span>
+          <h4>Threat-Model the Signal Chain, Not Just the Network</h4>
+          <p>Every external input to a control system — sensor readings, GPS timing, external reference signals — should be evaluated for how it could be manipulated, by whom, and to what effect. Start the threat model before the PLC.</p>
+        </div>
+        <div class="pillar red-border">
+          <span class="pillar-num">PRINCIPLE 02</span>
+          <h4>Require Cross-Sensor Corroboration for Safety-Critical Values</h4>
+          <p>No single sensor should be the sole input to a safety-critical decision. Redundant sensing with cross-correlation and physical-model validation creates the minimum viable signal integrity posture. Disagreement between sensors is an alert condition, not a nuisance.</p>
+        </div>
+        <div class="pillar">
+          <span class="pillar-num">PRINCIPLE 03</span>
+          <h4>Monitor Rate-of-Change, Not Just Threshold</h4>
+          <p>Alarm setpoints are designed to catch hardware faults. They are not designed to catch gradual, deliberate drift. Process monitoring systems should track rate-of-change trends alongside absolute values — the trajectory of a reading over time can be more informative than the reading itself.</p>
+        </div>
+        <div class="pillar green-border">
+          <span class="pillar-num">PRINCIPLE 04</span>
+          <h4>Treat GNSS Timing as an External Input That Can Lie</h4>
+          <p>GPS-derived timing is deeply embedded in grid synchronization, substation protection, and SCADA timestamping. It is also an RF signal broadcast from space that can be spoofed or jammed. Systems that depend on GPS timing for safety-critical functions should have authenticated backup timing sources.</p>
+        </div>
+        <div class="pillar red-border">
+          <span class="pillar-num">PRINCIPLE 05</span>
+          <h4>Document Signal Assumptions Explicitly</h4>
+          <p>Most control system documentation specifies what signals are used. Very few document what those signals are assumed to represent, over what range they are considered valid, and what behavior should occur if they are inconsistent with corroborating measurements. Making trust assumptions explicit is the first step to auditing them.</p>
+        </div>
+      </div>
+
+      <div class="callout callout-red">
+        <p>If your threat model begins at the network perimeter, you are starting too late. The adversary who understands this will always have a layer of access you are not watching.</p>
+      </div>
+
+      <h2>Why This Is Hard to Fix</h2>
+
+      <p>The "Inputs Lie" problem does not have a straightforward remediation path, and it would be dishonest to suggest otherwise. Several realities complicate any practical defensive response:</p>
+
+      <ul>
+        <li><strong>Legacy infrastructure cannot be easily modified.</strong> Sensor wiring, input modules, and RTU configurations were installed to run processes, not to implement security architectures. Retrofitting cross-validation logic into systems that were not designed for it requires engineering work that operations teams are rarely resourced to undertake.</li>
+        <li><strong>Process physics expertise is required.</strong> Distinguishing sensor manipulation from normal process variation requires understanding what the process should look like under normal operating conditions — knowledge that sits with process engineers, not security analysts. Effective defense at this layer requires a collaboration between disciplines that rarely talk to each other.</li>
+        <li><strong>The attacker has time.</strong> A patient adversary can conduct reconnaissance of normal operating patterns over weeks or months before manipulating signals. They know what "normal" looks like. Any detection system that relies on detecting deviation from normal must also account for an attacker who spent time learning what normal is.</li>
+        <li><strong>There is no patch for physics.</strong> Network vulnerabilities can be patched. Protocol weaknesses can be mitigated. Signal-layer vulnerabilities require physical changes — redundant sensing, shielding, authenticated timing references — that have cost, complexity, and operational risk associated with them.</li>
+      </ul>
+
+      <p>None of this means defense is impossible. It means defense is different than it is for conventional IT security — more deliberate, more specialized, more expensive, and more tightly coupled to the specific processes being protected.</p>
+
+      <!-- Verdict -->
+      <div class="verdict-block">
+        <span class="verdict-text">The most dangerous assumption in ICS security is that a signal is telling the truth because it arrived within range.</span>
+        <p>Threat-model your signals. Validate across sensors. Monitor trajectory, not just threshold. Start the security model before the PLC.</p>
+      </div>
+
+      <h2>What Comes Next</h2>
+
+      <p>The next post in this series moves from the conceptual to the specific: how PLC and RTU logic actually fails when adversarial inputs are present, what that looks like in ladder logic and function block diagrams, and why deterministic execution is both the strength and the vulnerability of industrial control systems.</p>
+
+      <div class="next-card">
+        <span class="next-label">// NEXT IN SERIES · BSides Delaware Series · Part 3</span>
+        <h3>Logic Follows Lies: How PLCs and RTUs Fail Under Adversarial Conditions</h3>
+        <p>When the input is wrong, the logic is loyal to a lie. A deep look at how deterministic PLC execution becomes an attack surface when signal integrity is absent — and what defenders should be looking for at the ladder logic layer.</p>
+        <a href="logic-follows-lies-plc-rtu.html" class="btn btn-outline">READ PART 3 →</a>
+      </div>
+
+    </div><!-- /.article-body -->
+
+    <!-- Author Bio -->
+    <div class="author-bio">
+      <div class="bio-initials">NC</div>
+      <div class="bio-text">
+        <h4>Norris Cornell</h4>
+        <p>Nearly 20 years as an electronics technician, now working at the intersection of physical-layer security and critical infrastructure defense. Author of the "Inputs Lie" research framework. Master's in SCADA Cybersecurity, Wilmington University. Technical Lead for IAM in the financial sector. BSides Delaware organizer since 2015.</p>
+      </div>
+    </div>
+
+    <!-- Copyright -->
+    <div class="article-copyright">
+      <p>© 2024 Norris Cornell. All Rights Reserved.</p>
+      <p>This article, the "Inputs Lie" framework, and all associated analysis are the intellectual property of Norris Cornell. Reproduction, redistribution, or use in any form without prior written permission is prohibited. Research presented at BSides Delaware.</p>
+    </div>
+
+  </article>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">CORNELL <span>SECURITY</span></div>
+    <div class="footer-copy">© 2026 NORRIS CORNELL · ALL RIGHTS RESERVED</div>
+  </div>
+  <div class="footer-legal">
+    All content, research, frameworks, and written works published on this site are the intellectual property of Norris Cornell
+    and are protected by copyright. Reproduction, redistribution, or use in any form without prior written permission is prohibited.
+  </div>
+</footer>
+
+</body>
+</html>

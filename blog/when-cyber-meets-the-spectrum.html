@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Satellite Cybersecurity: When Cyber Meets the Spectrum — Cornell Security</title>
+  <meta name="description" content="How SIGINT, ICS, and application security converge in the invisible domain we depend on. BSides Delaware 2025 presentation expanded into full research article.">
+  <meta name="author" content="Norris Cornell">
+  <meta name="copyright" content="© 2025 Norris Cornell. All Rights Reserved.">
+  <link rel="canonical" href="https://cornellsecurity.com/blog/when-cyber-meets-the-spectrum.html">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .article-wrapper { max-width: 800px; margin: 0 auto; padding: 3rem 2rem 5rem; }
+    .article-header { margin-bottom: 3rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
+    .article-header h1 { font-family: var(--font-heading); font-size: clamp(1.7rem, 3.2vw, 2.4rem); font-weight: 700; color: #fff; line-height: 1.2; letter-spacing: 0.03em; margin-bottom: 0.75rem; }
+    .article-header .subtitle { font-family: var(--font-body); font-size: 1.05rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1.25rem; }
+    .article-meta { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; margin-bottom: 0.75rem; }
+    .article-meta span { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); letter-spacing: 0.1em; }
+    .article-meta .meta-author { color: var(--accent-cyan); }
+    .series-badge { display: inline-block; font-family: var(--font-mono); font-size: 0.68rem; color: var(--accent-green); background: rgba(0,255,159,0.08); border: 1px solid rgba(0,255,159,0.2); padding: 0.3rem 0.75rem; border-radius: var(--radius); letter-spacing: 0.12em; margin-bottom: 1rem; }
+
+    .article-body h2 { font-family: var(--font-heading); font-size: 1.45rem; font-weight: 700; color: #fff; letter-spacing: 0.04em; margin: 2.75rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+    .article-body h3 { font-family: var(--font-heading); font-size: 1.05rem; font-weight: 600; color: var(--accent-cyan); letter-spacing: 0.06em; margin: 1.75rem 0 0.6rem; }
+    .article-body p { color: var(--text-secondary); font-size: 0.98rem; line-height: 1.85; margin-bottom: 1.15rem; }
+    .article-body strong { color: var(--text-primary); font-weight: 600; }
+    .article-body ul { color: var(--text-secondary); font-size: 0.97rem; line-height: 1.85; padding-left: 1.5rem; margin-bottom: 1.25rem; }
+    .article-body ul li { margin-bottom: 0.6rem; }
+
+    /* Opening hook */
+    .hook-block {
+      background: var(--bg-deep);
+      border: 1px solid var(--border-accent);
+      border-radius: var(--radius);
+      padding: 2.25rem 2rem;
+      margin-bottom: 2.5rem;
+      text-align: center;
+    }
+    .hook-block .hook-statement {
+      font-family: var(--font-heading);
+      font-size: clamp(1.2rem, 2.8vw, 1.7rem);
+      font-weight: 700;
+      color: var(--accent-cyan);
+      letter-spacing: 0.04em;
+      line-height: 1.35;
+      margin-bottom: 1rem;
+      display: block;
+    }
+    .hook-block p { color: var(--text-muted); font-size: 0.92rem; line-height: 1.75; margin: 0; }
+
+    /* Callouts */
+    .callout { background: rgba(0,212,255,0.05); border-left: 3px solid var(--accent-cyan); padding: 1rem 1.25rem; margin: 1.75rem 0; border-radius: 0 var(--radius) var(--radius) 0; }
+    .callout p { margin: 0; color: var(--text-primary); font-size: 1.02rem; font-style: italic; line-height: 1.7; }
+    .callout-red { border-left-color: var(--accent-red); background: rgba(255,71,87,0.05); }
+    .callout-green { border-left-color: var(--accent-green); background: rgba(0,255,159,0.05); }
+    .callout-yellow { border-left-color: #f5a623; background: rgba(245,166,35,0.05); }
+
+    /* Presentation badge */
+    .presentation-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: rgba(0,212,255,0.06);
+      border: 1px solid rgba(0,212,255,0.2);
+      border-radius: var(--radius);
+      padding: 0.6rem 1rem;
+      margin-bottom: 2rem;
+    }
+    .presentation-badge .pb-icon { color: var(--accent-cyan); font-size: 1rem; }
+    .presentation-badge .pb-text { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-secondary); letter-spacing: 0.1em; }
+    .presentation-badge .pb-text strong { color: var(--accent-cyan); }
+
+    /* Attack comparison */
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1.75rem 0;
+    }
+    @media (max-width: 600px) { .compare-grid { grid-template-columns: 1fr; } }
+    .compare-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+    }
+    .compare-card .cc-label {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      display: block;
+      margin-bottom: 0.75rem;
+    }
+    .compare-card.network .cc-label { color: var(--text-muted); }
+    .compare-card.rf .cc-label { color: var(--accent-red); }
+    .compare-card h4 {
+      font-family: var(--font-heading);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.6rem;
+    }
+    .compare-card ul { padding-left: 1.1rem; margin: 0; }
+    .compare-card ul li { font-size: 0.86rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 0.3rem; }
+
+    /* Controls gap table */
+    .controls-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.75rem 0;
+      font-size: 0.87rem;
+    }
+    .controls-table th {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      text-align: left;
+      padding: 0.6rem 0.9rem;
+      background: var(--bg-deep);
+      border-bottom: 1px solid var(--border-accent);
+    }
+    .controls-table td {
+      padding: 0.75rem 0.9rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-secondary);
+      vertical-align: top;
+      line-height: 1.6;
+    }
+    .controls-table tr:last-child td { border-bottom: none; }
+    .controls-table .td-control { color: var(--accent-cyan); font-family: var(--font-mono); font-size: 0.8rem; white-space: nowrap; }
+    .controls-table .td-reach { color: var(--text-secondary); }
+    .controls-table .td-miss { color: var(--accent-red); }
+
+    /* Case study blocks */
+    .case-study {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin: 1.75rem 0;
+    }
+    .case-study .cs-label {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      color: var(--accent-red);
+      letter-spacing: 0.14em;
+      display: block;
+      margin-bottom: 0.75rem;
+    }
+    .case-study h4 {
+      font-family: var(--font-heading);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.03em;
+      margin-bottom: 0.75rem;
+    }
+    .case-study p { font-size: 0.92rem; color: var(--text-secondary); line-height: 1.75; margin-bottom: 0.75rem; }
+    .case-study p:last-child { margin-bottom: 0; }
+    .case-study .cs-impact {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--accent-red);
+      background: rgba(255,71,87,0.07);
+      border: 1px solid rgba(255,71,87,0.15);
+      border-radius: var(--radius);
+      padding: 0.6rem 1rem;
+      margin-top: 0.75rem;
+      display: block;
+    }
+
+    /* Attack chain */
+    .attack-chain {
+      background: #020508;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+      margin: 1.75rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+    }
+    .attack-chain .chain-label { color: var(--accent-cyan); font-size: 0.68rem; letter-spacing: 0.15em; display: block; margin-bottom: 1.25rem; }
+    .attack-chain .chain-step { display: flex; gap: 1rem; padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.04); align-items: flex-start; }
+    .attack-chain .chain-step:last-child { border-bottom: none; }
+    .attack-chain .step-n { color: var(--accent-cyan); min-width: 2rem; }
+    .attack-chain .step-body { flex: 1; }
+    .attack-chain .step-event { color: #fff; display: block; margin-bottom: 0.2rem; }
+    .attack-chain .step-cause { color: var(--accent-red); font-size: 0.76rem; }
+
+    /* Three trends */
+    .trend-cards { display: flex; flex-direction: column; gap: 1rem; margin: 1.75rem 0; }
+    .trend-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      gap: 1.25rem;
+      align-items: flex-start;
+    }
+    .trend-num {
+      font-family: var(--font-heading);
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: rgba(0,212,255,0.2);
+      line-height: 1;
+      flex-shrink: 0;
+      min-width: 2.5rem;
+    }
+    .trend-card h4 { font-family: var(--font-heading); font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 0.4rem; }
+    .trend-card p { font-size: 0.88rem; color: var(--text-muted); line-height: 1.65; margin: 0; }
+
+    /* Defensive steps */
+    .defense-steps { display: flex; flex-direction: column; gap: 0.9rem; margin: 1.75rem 0; }
+    .defense-step {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent-green);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      padding: 1rem 1.5rem;
+    }
+    .defense-step .ds-label { font-family: var(--font-mono); font-size: 0.66rem; color: var(--accent-green); letter-spacing: 0.14em; display: block; margin-bottom: 0.4rem; }
+    .defense-step h4 { font-family: var(--font-heading); font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 0.4rem; }
+    .defense-step p { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.65; margin: 0; }
+
+    /* Visibility framework */
+    .visibility-steps { counter-reset: vis-steps; display: flex; flex-direction: column; gap: 0.75rem; margin: 1.5rem 0; }
+    .visibility-step {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.9rem 1.25rem;
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+    .vis-num { font-family: var(--font-mono); font-size: 0.82rem; color: var(--accent-cyan); min-width: 1.5rem; }
+    .vis-body h4 { font-family: var(--font-heading); font-size: 0.92rem; font-weight: 700; color: #fff; margin-bottom: 0.25rem; }
+    .vis-body p { font-size: 0.86rem; color: var(--text-muted); line-height: 1.6; margin: 0; }
+
+    /* Closing verdict */
+    .verdict-block {
+      background: var(--bg-deep);
+      border: 1px solid var(--border-accent);
+      border-radius: var(--radius);
+      padding: 2.25rem 2rem;
+      margin: 2.5rem 0;
+      text-align: center;
+    }
+    .verdict-block .verdict-text {
+      font-family: var(--font-heading);
+      font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.04em;
+      line-height: 1.4;
+      margin-bottom: 0.75rem;
+    }
+    .verdict-block .verdict-sub { color: var(--accent-cyan); font-family: var(--font-mono); font-size: 0.82rem; letter-spacing: 0.1em; }
+
+    /* Timeline stat row */
+    .timeline-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin: 1.75rem 0;
+    }
+    .timeline-stat {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+      text-align: center;
+    }
+    .timeline-stat .ts-year { font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent-cyan); letter-spacing: 0.1em; display: block; margin-bottom: 0.4rem; }
+    .timeline-stat p { font-size: 0.83rem; color: var(--text-muted); line-height: 1.5; margin: 0; }
+
+    /* Author bio */
+    .author-bio {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-top: 2.5rem;
+      display: flex;
+      gap: 1.25rem;
+      align-items: flex-start;
+    }
+    .author-bio .bio-initials {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      background: rgba(0,212,255,0.08);
+      border: 1px solid rgba(0,212,255,0.2);
+      border-radius: 50%;
+      width: 48px; height: 48px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .author-bio .bio-text h4 { font-family: var(--font-heading); font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 0.3rem; }
+    .author-bio .bio-text p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.65; margin: 0; }
+
+    /* Article copyright */
+    .article-copyright {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+    .back-link { display: inline-block; font-family: var(--font-mono); font-size: 0.78rem; color: var(--accent-cyan); text-decoration: none; letter-spacing: 0.08em; margin-bottom: 2rem; }
+    .back-link:hover { color: #fff; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-container">
+    <a href="../index.html" class="nav-brand">
+      <span class="brand-icon">◈</span>
+      <span>CORNELL <span class="brand-accent">SECURITY</span></span>
+    </a>
+    <div class="nav-links" id="navLinks">
+      <a href="../about.html">ABOUT</a>
+      <a href="../research.html">RESEARCH</a>
+      <a href="../blog.html" class="active">BLOG</a>
+      <a href="../contact.html">CONTACT</a>
+    </div>
+    <button class="nav-toggle" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
+  </div>
+</nav>
+
+<div class="page-wrapper">
+  <article class="article-wrapper">
+
+    <a href="../blog.html" class="back-link">← BACK TO BLOG</a>
+
+    <header class="article-header">
+      <span class="series-badge">BSides Delaware 2025 · Expanded Research</span>
+      <h1>Satellite Cybersecurity: When Cyber Meets the Spectrum</h1>
+      <p class="subtitle">How SIGINT, ICS, and Application Security Converge in the Invisible Domain We Depend On</p>
+      <div class="article-meta">
+        <span class="meta-author">Norris Cornell</span>
+        <span>·</span>
+        <span>November 2025</span>
+        <span>·</span>
+        <span>Satellite / RF Security</span>
+        <span>·</span>
+        <span>Critical Infrastructure</span>
+        <span>·</span>
+        <span>SIGINT</span>
+      </div>
+
+      <div class="presentation-badge">
+        <span class="pb-icon">◈</span>
+        <span class="pb-text">Presented at <strong>BSides Delaware 2025</strong> — This article expands on the original research</span>
+      </div>
+    </header>
+
+    <div class="article-body">
+
+      <!-- Hook -->
+      <div class="hook-block">
+        <span class="hook-statement">Every day, critical infrastructure runs on signals we can't see.</span>
+        <p>Satellite timing guides the power grid. GNSS signals coordinate automation sequences. RF links relay data to SCADA systems. Software systems make decisions based on timing they assume is trustworthy. Yet most cybersecurity programs treat satellites and RF systems as "someone else's problem."</p>
+      </div>
+
+      <p>I gave a talk at BSides Delaware 2025 making the case that this blind spot is no longer acceptable. This article expands on that research, sharing insights I hope will help defenders understand why satellite cybersecurity isn't a niche concern — it's foundational infrastructure we've been defending with our eyes closed.</p>
+
+      <h2>The Invisible Layer We've Built Into Everything</h2>
+
+      <p>If you pull up the architecture diagram for almost any critical infrastructure system in the United States, you'll see satellites mentioned. They're in the disaster recovery plans. They're in the facility topology. But look at the threat model, the vulnerability assessments, the incident response procedures — and they're largely absent.</p>
+
+      <p>This isn't because satellites aren't important. It's because we've compartmentalized them out of our mental models.</p>
+
+      <p>The power grid relies on GPS-disciplined clocks for synchrophasor measurements that track grid stability in real time. Wind farms use GNSS for timing coordination. Water treatment facilities depend on RF-based SCADA communications. Financial systems need atomic clock precision from satellite feeds.</p>
+
+      <p>Yet when we think about "critical infrastructure cybersecurity," we're still mostly thinking about firewalls, VPNs, and network segmentation.</p>
+
+      <div class="callout">
+        <p>Satellites operate in a domain your traditional security controls don't reach. Firewalls can't filter RF signals. IDS signatures don't exist for modulated waveforms. Your zero-trust architecture doesn't include the spectrum. This is the gap we need to close.</p>
+      </div>
+
+      <h2>The Attack Surface You Can't See</h2>
+
+      <p>To understand satellite vulnerabilities, you first need to understand how traditional attacks differ from RF-layer attacks.</p>
+
+      <div class="compare-grid">
+        <div class="compare-card network">
+          <span class="cc-label">// TRADITIONAL NETWORK ATTACK</span>
+          <h4>Inside the Perimeter</h4>
+          <ul>
+            <li>Compromise VPN, steal credentials, or find unpatched service</li>
+            <li>Gain access to the environment</li>
+            <li>SOC has tools to detect: firewalls log connections, EDR catches lateral movement, SIEM correlates events</li>
+            <li>Difficult — but within scope of defenses built over decades</li>
+          </ul>
+        </div>
+        <div class="compare-card rf">
+          <span class="cc-label">// RF-LAYER ATTACK</span>
+          <h4>Before the Perimeter</h4>
+          <ul>
+            <li>Software-defined radio, a few thousand dollars in equipment</li>
+            <li>Knowledge of signal structure, physical proximity or line-of-sight</li>
+            <li>Intercept, spoof, or jam the signal — before it becomes a packet your security controls can see</li>
+            <li>Your SOC has zero visibility into this domain</li>
+          </ul>
+        </div>
+      </div>
+
+      <p>This is signals intelligence (SIGINT) applied to critical infrastructure. And unlike traditional cybersecurity where we've been building defenses for decades, most infrastructure operators have zero visibility into this domain.</p>
+
+      <h2>When RF Vulnerabilities Become Operational Disasters</h2>
+
+      <p>The part that matters for defenders: RF vulnerabilities only become operational disasters when they meet application security failures. Let me make this concrete.</p>
+
+      <div class="attack-chain">
+        <span class="chain-label">// ATTACK CHAIN — GPS SPOOF → GRID IMPACT</span>
+        <div class="chain-step">
+          <span class="step-n">01</span>
+          <div class="step-body">
+            <span class="step-event">Adversary deploys civilian GPS spoofer — injects false timing data</span>
+            <span class="step-cause">RF-layer: minor signal manipulation, 2–3 second timing error</span>
+          </div>
+        </div>
+        <div class="chain-step">
+          <span class="step-n">02</span>
+          <div class="step-body">
+            <span class="step-event">Synchrophasor protection relay receives spoofed GPS timestamp</span>
+            <span class="step-cause">AppSec failure: timestamp never validated — assumed trustworthy since the 1990s</span>
+          </div>
+        </div>
+        <div class="chain-step">
+          <span class="step-n">03</span>
+          <div class="step-body">
+            <span class="step-event">Relay calculates false power flow angle using corrupt timing</span>
+            <span class="step-cause">Logic is correct — operating on a false premise</span>
+          </div>
+        </div>
+        <div class="chain-step">
+          <span class="step-n">04</span>
+          <div class="step-body">
+            <span class="step-event">Application interprets result as islanding event — unexpected grid section disconnection</span>
+            <span class="step-cause">No bound validation on the timestamp; no cross-reference to internal clock</span>
+          </div>
+        </div>
+        <div class="chain-step">
+          <span class="step-n">05</span>
+          <div class="step-body">
+            <span class="step-event">Relay triggers false load shedding — automatically disconnects generation</span>
+            <span class="step-cause">2-second RF manipulation → 50,000 customer loads manually shed</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout callout-red">
+        <p>It's not just an RF problem. It's not just an AppSec problem. It's both — simultaneously — in the same attack chain. The defenses need to span both domains.</p>
+      </div>
+
+      <h2>Real-World Evidence: When Theory Becomes Practice</h2>
+
+      <p>We don't have to speculate about this. We have recent, documented examples.</p>
+
+      <div class="case-study">
+        <span class="cs-label">CASE STUDY · 01 — GPS SPOOFING RESEARCH</span>
+        <h4>GPS Spoofing Against Power Systems</h4>
+        <p>Researchers at the University of Texas demonstrated, in peer-reviewed studies, that civilian-grade GPS spoofers could successfully deceive commercial synchrophasor applications. They showed timing errors that would propagate through protection logic and trigger false relays. The research wasn't theoretical — they tested it against real systems, real protocols, real applications.</p>
+        <p>The implication was clear: any electrical utility relying on GPS for critical timing, without proper input validation in the software stack, has a vulnerability that an adversary with modest resources can exploit.</p>
+        <span class="cs-impact">⚠ Implication: Commodity hardware. No network access required. No CVE to patch.</span>
+      </div>
+
+      <div class="case-study">
+        <span class="cs-label">CASE STUDY · 02 — VIASAT ATTACK (2022)</span>
+        <h4>The Viasat Attack and Wind Farm Blackout</h4>
+        <p>In 2022, adversaries conducted a cyberattack on Viasat's KA-SAT satellite network, disrupting service to thousands of customers across Europe. More significantly, it took approximately 5,800 wind turbines offline — wind farms that relied on satellite-based management and control communications.</p>
+        <p>To put this in perspective: 5,800 turbines represent roughly 11 gigawatts of generation capacity. That's equivalent to 8–10 large power plants going offline simultaneously. This wasn't a localized outage — it was grid-scale impact from a single satellite attack.</p>
+        <p>The turbines didn't fail because of a sophisticated zero-day. They failed because the infrastructure was architected with satellite links as load-bearing infrastructure.</p>
+        <span class="cs-impact">⚠ ~5,800 turbines / ~11 GW generation capacity lost / Single attack vector</span>
+      </div>
+
+      <h2>SIGINT Meets Application Security: A New Problem Space</h2>
+
+      <p>Traditional SIGINT — the discipline of intercepting and analyzing electronic signals — has always been a military and intelligence domain. RF spoofing, jamming, and interception were problems for defense contractors and government agencies, not for utility operators and financial institutions. But three trends are changing that rapidly.</p>
+
+      <div class="trend-cards">
+        <div class="trend-card">
+          <span class="trend-num">01</span>
+          <div>
+            <h4>The RF Domain Is Becoming More Accessible</h4>
+            <p>Software-defined radios have democratized signal analysis. You can buy an SDR capable of analyzing and transmitting signals in the GHz range for a few hundred dollars. The technical barriers to entry are lower than they've ever been.</p>
+          </div>
+        </div>
+        <div class="trend-card">
+          <span class="trend-num">02</span>
+          <div>
+            <h4>Critical Infrastructure Increasingly Depends on Wireless Links</h4>
+            <p>Hardened fiber is expensive and isn't always available in remote locations. Satellite links provide geographic diversity and backup connectivity. But that diversity comes at the cost of exposing systems to the RF domain.</p>
+          </div>
+        </div>
+        <div class="trend-card">
+          <span class="trend-num">03</span>
+          <div>
+            <h4>Application Security Practices Don't Account for RF-Level Attacks</h4>
+            <p>An input validation checklist doesn't mention "what if the GPS signal is spoofed?" A threat model doesn't include "adversary with SDR in the parking lot." Secure coding standards don't address "validate that this timing signal isn't 6 hours in the future."</p>
+          </div>
+        </div>
+      </div>
+
+      <h2>Why Your Network Defenses Don't Reach Here</h2>
+
+      <table class="controls-table">
+        <thead>
+          <tr>
+            <th>SECURITY CONTROL</th>
+            <th>WHAT IT DOES</th>
+            <th>WHY IT DOESN'T REACH THE RF LAYER</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-control">Firewall Rules</td>
+            <td class="td-reach">Examines network traffic, filters connections</td>
+            <td class="td-miss">RF interception happens before the signal is decoded into packets</td>
+          </tr>
+          <tr>
+            <td class="td-control">Network Encryption</td>
+            <td class="td-reach">Protects the channel from interception</td>
+            <td class="td-miss">Protects the channel, not the RF modulation itself; legacy systems often lack it anyway</td>
+          </tr>
+          <tr>
+            <td class="td-control">Network Segmentation</td>
+            <td class="td-reach">Limits lateral movement</td>
+            <td class="td-miss">Irrelevant if the attacker bypasses the network by attacking the wireless link feeding into it</td>
+          </tr>
+          <tr>
+            <td class="td-control">IDS/IPS Signatures</td>
+            <td class="td-reach">Detects known malicious patterns in traffic</td>
+            <td class="td-miss">An RF spoof crafted to match the expected signal format won't trigger signature-based detection</td>
+          </tr>
+          <tr>
+            <td class="td-control">EDR / Behavioral Analysis</td>
+            <td class="td-reach">Monitors endpoint activity and network flows</td>
+            <td class="td-miss">Doesn't see RF signals — operates entirely above the physical layer</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>Your most mature security capabilities — the ones you've invested years in building — don't extend to the RF layer. An adversary can operate in the RF domain with relative impunity because you don't have visibility, detection, or response capabilities there.</p>
+
+      <h2>Defense-in-Depth: What Defenders Can Do Now</h2>
+
+      <div class="defense-steps">
+        <div class="defense-step">
+          <span class="ds-label">STEP 01</span>
+          <h4>Start With Visibility</h4>
+          <p>You can't defend what you can't see. Begin by cataloging which systems depend on RF-sourced data: GPS, GNSS, satellite communications, microwave links, RF sensors. Map these as critical dependencies in your architecture. Include them in your threat models.</p>
+        </div>
+        <div class="defense-step">
+          <span class="ds-label">STEP 02</span>
+          <h4>Implement Input Validation at the Application Layer</h4>
+          <p>This is classic AppSec — applied to RF inputs. For timing-dependent systems: validate that timestamps are within reasonable bounds of your internal clock. Reject data that claims to be from the future or distant past. Implement rate-of-change validation — if a timestamp changes by more than expected in one update cycle, flag it.</p>
+        </div>
+        <div class="defense-step">
+          <span class="ds-label">STEP 03</span>
+          <h4>Add Redundancy and Cross-Sensor Corroboration</h4>
+          <p>Don't rely on a single GNSS receiver or satellite link. Correlate timing data from multiple sources. If they disagree beyond expected tolerances, alert on it. For critical systems, implement voting mechanisms where multiple independent sensors must agree before a significant action is taken.</p>
+        </div>
+        <div class="defense-step">
+          <span class="ds-label">STEP 04</span>
+          <h4>Develop RF-Domain Detection Capabilities</h4>
+          <p>Partner with your RF engineers and spectrum management teams. Understand what normal RF activity looks like at your facilities. Implement spectrum monitoring to detect spoofing attempts or jamming. This is a capability gap most security teams haven't started closing yet.</p>
+        </div>
+        <div class="defense-step">
+          <span class="ds-label">STEP 05</span>
+          <h4>Build Resilience Into Operational Procedures</h4>
+          <p>When RF inputs fail or become suspicious, what happens? Design your systems to degrade gracefully rather than fail hard. Implement manual fallback procedures for critical operations if RF-sourced data becomes unavailable or suspect.</p>
+        </div>
+        <div class="defense-step">
+          <span class="ds-label">STEP 06</span>
+          <h4>Educate Across Disciplines</h4>
+          <p>SOC analysts, application security engineers, infrastructure operators — they likely don't think about RF attacks as part of their threat model. Build training that explains RF vulnerabilities, SIGINT concepts, and how they apply to your specific systems. This is a cross-domain problem that requires cross-domain awareness.</p>
+        </div>
+      </div>
+
+      <h2>The Timeline Matters</h2>
+
+      <div class="timeline-row">
+        <div class="timeline-stat">
+          <span class="ts-year">MID-2010s</span>
+          <p>University of Texas research on GPS spoofing against power systems published in peer-reviewed literature</p>
+        </div>
+        <div class="timeline-stat">
+          <span class="ts-year">2022</span>
+          <p>Viasat attack demonstrates grid-scale impact — ~5,800 turbines offline from a single satellite attack</p>
+        </div>
+        <div class="timeline-stat">
+          <span class="ts-year">ONGOING</span>
+          <p>SDR capabilities continue to become more accessible; adversary sophistication and nation-state interest increasing</p>
+        </div>
+        <div class="timeline-stat">
+          <span class="ts-year">NOW</span>
+          <p>The theory isn't emerging anymore. The threat is present. The window for getting ahead of it is closing.</p>
+        </div>
+      </div>
+
+      <div class="callout callout-yellow">
+        <p>Nation-states with significant SIGINT capabilities are increasingly interested in critical infrastructure as a strategic target. They have the resources to develop RF-layer exploits. They have the intelligence to understand your specific systems, frequencies, and protocols. The sophistication bar for RF-based attacks is rising.</p>
+      </div>
+
+      <h2>Making the Invisible Visible</h2>
+
+      <p>Coming back to where we started: satellites are the invisible layer of your infrastructure. They're in your architecture diagrams. They're in your disaster recovery plans. They're woven into your most critical operational systems. But they're absent from your threat models, your security assessments, and your incident response procedures.</p>
+
+      <div class="visibility-steps">
+        <div class="visibility-step">
+          <span class="vis-num">01</span>
+          <div class="vis-body">
+            <h4>Acknowledge the Dependency</h4>
+            <p>Map where satellite and RF-sourced data flows through your critical systems. Name it explicitly in your architecture.</p>
+          </div>
+        </div>
+        <div class="visibility-step">
+          <span class="vis-num">02</span>
+          <div class="vis-body">
+            <h4>Extend Your Threat Model</h4>
+            <p>Add RF-layer attacks alongside network attacks in your scenario planning. If your threat model starts at the network perimeter, you're starting too late.</p>
+          </div>
+        </div>
+        <div class="visibility-step">
+          <span class="vis-num">03</span>
+          <div class="vis-body">
+            <h4>Implement Technical Controls</h4>
+            <p>From input validation to redundancy to RF-domain monitoring — start with what's achievable, then build toward comprehensive coverage.</p>
+          </div>
+        </div>
+        <div class="visibility-step">
+          <span class="vis-num">04</span>
+          <div class="vis-body">
+            <h4>Develop Specialized Expertise</h4>
+            <p>Build internal capabilities or partnerships that bring SIGINT and RF knowledge into your security program. This is not optional if satellites are in your critical path.</p>
+          </div>
+        </div>
+        <div class="visibility-step">
+          <span class="vis-num">05</span>
+          <div class="vis-body">
+            <h4>Update Standards and Compliance</h4>
+            <p>Work with industry bodies to ensure that satellite cybersecurity becomes a recognized, required part of critical infrastructure defense — not a footnote in the threat model.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Verdict -->
+      <div class="verdict-block">
+        <div class="verdict-text">The convergence of SIGINT, ICS, and application security is happening.</div>
+        <p class="verdict-sub">// THE QUESTION IS WHETHER YOU MAKE THE INVISIBLE LAYER VISIBLE BEFORE AN ADVERSARY DOES IT FOR YOU</p>
+      </div>
+
+    </div><!-- /.article-body -->
+
+    <!-- Author Bio -->
+    <div class="author-bio">
+      <div class="bio-initials">NC</div>
+      <div class="bio-text">
+        <h4>Norris Cornell</h4>
+        <p>Cybersecurity professional with background in electrical engineering and specialized expertise in SCADA systems and critical infrastructure security. IAM Technical Lead in the financial sector. Research focus: the intersection of RF security, SIGINT, and application security applied to critical infrastructure. BSides Delaware organizer since 2015. This research was presented at BSides Delaware 2025.</p>
+      </div>
+    </div>
+
+    <!-- Copyright -->
+    <div class="article-copyright">
+      <p>© 2025 Norris Cornell. All Rights Reserved.</p>
+      <p>This article and all associated research are the intellectual property of Norris Cornell. Reproduction, redistribution, or use in any form without prior written permission is prohibited. Originally presented at BSides Delaware 2025.</p>
+    </div>
+
+  </article>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">CORNELL <span>SECURITY</span></div>
+    <div class="footer-copy">© 2026 NORRIS CORNELL · ALL RIGHTS RESERVED</div>
+  </div>
+  <div class="footer-legal">
+    All content, research, frameworks, and written works published on this site are the intellectual property of Norris Cornell
+    and are protected by copyright. Reproduction, redistribution, or use in any form without prior written permission is prohibited.
+  </div>
+</footer>
+
+</body>
+</html>

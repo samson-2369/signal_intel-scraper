@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Building a Cyber Defense Development Environment in a Virtual Machine — Cornell Security</title>
+  <meta name="description" content="A step-by-step guide to setting up a portable Ubuntu VM for AI-driven cybersecurity experiments, network discovery tooling, and blue team development. From VirtualBox to ARP scanning to anomaly detection.">
+  <meta name="author" content="Norris Cornell">
+  <meta name="copyright" content="© 2024 Norris Cornell. All Rights Reserved.">
+  <link rel="canonical" href="https://cornellsecurity.com/blog/cyber-defense-dev-environment.html">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .article-wrapper { max-width: 820px; margin: 0 auto; padding: 3rem 2rem 5rem; }
+    .article-header { margin-bottom: 3rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
+    .article-header h1 { font-family: var(--font-heading); font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 700; color: #fff; line-height: 1.2; letter-spacing: 0.03em; margin-bottom: 1.25rem; }
+    .article-meta { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; margin-bottom: 0.75rem; }
+    .article-meta span { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); letter-spacing: 0.1em; }
+    .article-meta .meta-author { color: var(--accent-cyan); }
+    .category-badge { display: inline-block; font-family: var(--font-mono); font-size: 0.68rem; color: var(--accent-green); background: rgba(0,255,159,0.08); border: 1px solid rgba(0,255,159,0.2); padding: 0.3rem 0.75rem; border-radius: var(--radius); letter-spacing: 0.12em; margin-bottom: 1rem; }
+
+    .article-body h2 { font-family: var(--font-heading); font-size: 1.35rem; font-weight: 700; color: #fff; letter-spacing: 0.04em; margin: 2.75rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+    .article-body p { color: var(--text-secondary); font-size: 0.98rem; line-height: 1.85; margin-bottom: 1.15rem; }
+    .article-body strong { color: var(--text-primary); font-weight: 600; }
+    .article-body ul { color: var(--text-secondary); font-size: 0.97rem; line-height: 1.85; padding-left: 1.5rem; margin-bottom: 1.25rem; }
+    .article-body ul li { margin-bottom: 0.5rem; }
+
+    /* Intro block */
+    .intro-block {
+      background: var(--bg-deep);
+      border: 1px solid var(--border-accent);
+      border-radius: var(--radius);
+      padding: 1.75rem 2rem;
+      margin-bottom: 2.5rem;
+    }
+    .intro-block p { color: var(--text-secondary); font-size: 0.96rem; line-height: 1.85; margin: 0; }
+
+    /* Callouts */
+    .callout { background: rgba(0,212,255,0.05); border-left: 3px solid var(--accent-cyan); padding: 1rem 1.25rem; margin: 1.75rem 0; border-radius: 0 var(--radius) var(--radius) 0; }
+    .callout p { margin: 0; color: var(--text-primary); font-size: 0.98rem; font-style: italic; line-height: 1.7; }
+    .callout-green { border-left-color: var(--accent-green); background: rgba(0,255,159,0.05); }
+
+    /* Step cards */
+    .step-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin: 2rem 0;
+    }
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 1.5rem;
+      background: var(--bg-deep);
+      border-bottom: 1px solid var(--border);
+    }
+    .step-number {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--accent-cyan);
+      background: rgba(0,212,255,0.1);
+      border: 1px solid rgba(0,212,255,0.25);
+      border-radius: var(--radius);
+      padding: 0.2rem 0.6rem;
+      letter-spacing: 0.12em;
+      flex-shrink: 0;
+    }
+    .step-title {
+      font-family: var(--font-heading);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.03em;
+    }
+    .step-body {
+      padding: 1.25rem 1.5rem;
+    }
+    .step-body p { color: var(--text-secondary); font-size: 0.93rem; line-height: 1.8; margin-bottom: 1rem; }
+    .step-body p:last-child { margin-bottom: 0; }
+    .step-body ul { color: var(--text-secondary); font-size: 0.91rem; line-height: 1.75; padding-left: 1.5rem; margin-bottom: 0.75rem; }
+    .step-body ul li { margin-bottom: 0.4rem; }
+
+    /* Terminal block */
+    .terminal {
+      background: #010407;
+      border: 1px solid rgba(0,212,255,0.15);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin: 1rem 0;
+    }
+    .terminal-bar {
+      background: rgba(0,212,255,0.06);
+      border-bottom: 1px solid rgba(0,212,255,0.1);
+      padding: 0.4rem 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .terminal-bar .t-dot { width: 9px; height: 9px; border-radius: 50%; }
+    .terminal-bar .t-dot.red { background: #ff5f57; }
+    .terminal-bar .t-dot.yellow { background: #ffbd2e; }
+    .terminal-bar .t-dot.green { background: #28ca41; }
+    .terminal-bar .t-label { font-family: var(--font-mono); font-size: 0.66rem; color: var(--text-muted); letter-spacing: 0.12em; margin-left: auto; }
+    .terminal pre {
+      margin: 0;
+      padding: 1.1rem 1.25rem;
+      font-family: var(--font-mono);
+      font-size: 0.81rem;
+      line-height: 1.75;
+      color: #c8d6e5;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .terminal pre .prompt { color: var(--accent-green); }
+    .terminal pre .cmd { color: #fff; }
+    .terminal pre .comment { color: #4a6072; }
+    .terminal pre .kw { color: var(--accent-cyan); }
+    .terminal pre .str { color: #a8d8a0; }
+    .terminal pre .func { color: #f0c674; }
+    .terminal pre .num { color: #de9a5d; }
+    .terminal pre .var { color: #c8d6e5; }
+    .terminal pre .out { color: var(--text-muted); }
+
+    /* Python block */
+    .code-block {
+      background: #010407;
+      border: 1px solid rgba(0,255,159,0.12);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin: 1rem 0;
+    }
+    .code-bar {
+      background: rgba(0,255,159,0.05);
+      border-bottom: 1px solid rgba(0,255,159,0.1);
+      padding: 0.4rem 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .code-bar .cb-icon { color: var(--accent-green); font-size: 0.75rem; }
+    .code-bar .cb-label { font-family: var(--font-mono); font-size: 0.66rem; color: var(--accent-green); letter-spacing: 0.12em; }
+    .code-block pre {
+      margin: 0;
+      padding: 1.1rem 1.25rem;
+      font-family: var(--font-mono);
+      font-size: 0.81rem;
+      line-height: 1.75;
+      color: #c8d6e5;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .code-block pre .comment { color: #4a6072; font-style: italic; }
+    .code-block pre .kw { color: var(--accent-cyan); }
+    .code-block pre .builtin { color: #f0c674; }
+    .code-block pre .str { color: #a8d8a0; }
+    .code-block pre .num { color: #de9a5d; }
+    .code-block pre .func { color: #79b8ff; }
+    .code-block pre .cls { color: #f0c674; }
+
+    /* VM settings table */
+    .vm-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      font-size: 0.87rem;
+    }
+    .vm-table th {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      text-align: left;
+      padding: 0.5rem 0.9rem;
+      background: var(--bg-deep);
+      border-bottom: 1px solid var(--border-accent);
+    }
+    .vm-table td {
+      padding: 0.6rem 0.9rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+    .vm-table tr:last-child td { border-bottom: none; }
+    .vm-table .td-setting { color: var(--accent-cyan); font-family: var(--font-mono); font-size: 0.8rem; }
+    .vm-table .td-value { color: #fff; font-family: var(--font-mono); font-size: 0.82rem; }
+    .vm-table .td-note { color: var(--text-muted); font-size: 0.83rem; }
+
+    /* What's next */
+    .next-block {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin: 2.5rem 0;
+    }
+    .next-block .nb-label { font-family: var(--font-mono); font-size: 0.68rem; color: var(--accent-cyan); letter-spacing: 0.14em; display: block; margin-bottom: 0.75rem; }
+    .next-block h3 { font-family: var(--font-heading); font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 0.75rem; }
+    .next-block ul { list-style: none; padding: 0; margin: 0; }
+    .next-block ul li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+    .next-block ul li:last-child { border-bottom: none; }
+    .next-block ul li::before { content: "→"; color: var(--accent-green); flex-shrink: 0; font-family: var(--font-mono); }
+
+    /* Author bio */
+    .author-bio {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-top: 2.5rem;
+      display: flex;
+      gap: 1.25rem;
+      align-items: flex-start;
+    }
+    .author-bio .bio-initials {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      background: rgba(0,212,255,0.08);
+      border: 1px solid rgba(0,212,255,0.2);
+      border-radius: 50%;
+      width: 48px; height: 48px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .author-bio .bio-text h4 { font-family: var(--font-heading); font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 0.3rem; }
+    .author-bio .bio-text p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.65; margin: 0; }
+
+    .article-copyright {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+    .back-link { display: inline-block; font-family: var(--font-mono); font-size: 0.78rem; color: var(--accent-cyan); text-decoration: none; letter-spacing: 0.08em; margin-bottom: 2rem; }
+    .back-link:hover { color: #fff; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-container">
+    <a href="../index.html" class="nav-brand">
+      <span class="brand-icon">◈</span>
+      <span>CORNELL <span class="brand-accent">SECURITY</span></span>
+    </a>
+    <div class="nav-links" id="navLinks">
+      <a href="../about.html">ABOUT</a>
+      <a href="../research.html">RESEARCH</a>
+      <a href="../blog.html" class="active">BLOG</a>
+      <a href="../contact.html">CONTACT</a>
+    </div>
+    <button class="nav-toggle" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
+  </div>
+</nav>
+
+<div class="page-wrapper">
+  <article class="article-wrapper">
+
+    <a href="../blog.html" class="back-link">← BACK TO BLOG</a>
+
+    <header class="article-header">
+      <span class="category-badge">Hands-On Lab Series</span>
+      <h1>Building a Cyber Defense Development Environment in a Virtual Machine</h1>
+      <div class="article-meta">
+        <span class="meta-author">Norris Cornell</span>
+        <span>·</span>
+        <span>Blue Team</span>
+        <span>·</span>
+        <span>Lab Setup</span>
+        <span>·</span>
+        <span>Python / Network Security</span>
+      </div>
+    </header>
+
+    <div class="article-body">
+
+      <div class="intro-block">
+        <p>In today's rapidly evolving cyber threat landscape, having a robust and flexible cybersecurity development environment is crucial for professionals aiming to enhance their defensive capabilities. This guide walks through setting up a powerful, portable development environment inside an Ubuntu XFCE virtual machine — designed to support AI-driven cybersecurity experiments and sophisticated network defense tools. Whether you're just getting started or expanding your skills, this gives you a reproducible blue-team lab you can take anywhere.</p>
+      </div>
+
+      <!-- STEP 1 -->
+      <div class="step-card">
+        <div class="step-header">
+          <span class="step-number">STEP 01</span>
+          <span class="step-title">Set Up the Base Environment</span>
+        </div>
+        <div class="step-body">
+          <p>Download and install <strong>VirtualBox</strong>. Then grab an <strong>Ubuntu XFCE ISO</strong> image — it gives you a lightweight Linux desktop without the overhead of a full GNOME or KDE environment. Create a new virtual machine with the following baseline settings:</p>
+
+          <table class="vm-table">
+            <thead>
+              <tr>
+                <th>SETTING</th>
+                <th>VALUE</th>
+                <th>NOTE</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="td-setting">RAM</td>
+                <td class="td-value">2 GB minimum</td>
+                <td class="td-note">4 GB recommended if running ML models later</td>
+              </tr>
+              <tr>
+                <td class="td-setting">Disk Space</td>
+                <td class="td-value">20 GB</td>
+                <td class="td-note">Dynamically allocated is fine</td>
+              </tr>
+              <tr>
+                <td class="td-setting">Network (default)</td>
+                <td class="td-value">NAT</td>
+                <td class="td-note">Internet access through host; safest default</td>
+              </tr>
+              <tr>
+                <td class="td-setting">Network (alternate)</td>
+                <td class="td-value">Bridged Adapter</td>
+                <td class="td-note">Direct access to your home network — needed for ARP scanning</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p>Mount the ISO, run through the installer, then update your packages and install the Python toolchain:</p>
+
+          <div class="terminal">
+            <div class="terminal-bar">
+              <span class="t-dot red"></span><span class="t-dot yellow"></span><span class="t-dot green"></span>
+              <span class="t-label">TERMINAL</span>
+            </div>
+            <pre><span class="prompt">$</span> <span class="cmd">sudo apt update</span>
+<span class="prompt">$</span> <span class="cmd">sudo apt install python3 python3-pip python3-venv</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="step-card">
+        <div class="step-header">
+          <span class="step-number">STEP 02</span>
+          <span class="step-title">Create an Isolated Python Environment</span>
+        </div>
+        <div class="step-body">
+          <p>Use Python's built-in <code>venv</code> module to isolate your development environment. This ensures installed libraries don't interfere with system-wide packages — and it makes your lab reproducible and portable.</p>
+
+          <div class="terminal">
+            <div class="terminal-bar">
+              <span class="t-dot red"></span><span class="t-dot yellow"></span><span class="t-dot green"></span>
+              <span class="t-label">TERMINAL</span>
+            </div>
+            <pre><span class="prompt">$</span> <span class="cmd">python3 -m venv ai-env</span>
+<span class="prompt">$</span> <span class="cmd">source ai-env/bin/activate</span>
+<span class="prompt">(ai-env) $</span> <span class="cmd">pip install tensorflow torch gymnasium stable-baselines3 jupyter</span></pre>
+          </div>
+
+          <div class="callout callout-green">
+            <p>Always activate your virtual environment before working on a project. It keeps dependencies scoped, makes collaboration cleaner, and prevents the "it worked on my machine" problem.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="step-card">
+        <div class="step-header">
+          <span class="step-number">STEP 03</span>
+          <span class="step-title">Build Your First Cyber Defense Agent</span>
+        </div>
+        <div class="step-body">
+          <p>Start simple: a ping-based host discovery agent. This establishes the basic pattern — iterate across a subnet, check for responsive hosts, log results — that everything more sophisticated builds on.</p>
+
+          <div class="terminal">
+            <div class="terminal-bar">
+              <span class="t-dot red"></span><span class="t-dot yellow"></span><span class="t-dot green"></span>
+              <span class="t-label">TERMINAL</span>
+            </div>
+            <pre><span class="prompt">(ai-env) $</span> <span class="cmd">pip install ping3</span></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-bar">
+              <span class="cb-icon">◈</span>
+              <span class="cb-label">PYTHON · ping_discovery.py</span>
+            </div>
+            <pre><span class="comment"># Basic ICMP host discovery across a /24 subnet</span>
+<span class="kw">from</span> ping3 <span class="kw">import</span> ping
+
+hosts = [<span class="str">"192.168.1."</span> + <span class="builtin">str</span>(i) <span class="kw">for</span> i <span class="kw">in</span> <span class="builtin">range</span>(<span class="num">1</span>, <span class="num">255</span>)]
+active_hosts = []
+
+<span class="kw">for</span> host <span class="kw">in</span> hosts:
+    response = <span class="func">ping</span>(host, timeout=<span class="num">1</span>)
+    <span class="kw">if</span> response:
+        <span class="builtin">print</span>(<span class="str">f"Host </span>{host}<span class="str"> is active."</span>)
+        active_hosts.<span class="func">append</span>(host)
+
+<span class="builtin">print</span>(<span class="str">f"Active hosts: </span>{active_hosts}<span class="str">"</span>)</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="step-card">
+        <div class="step-header">
+          <span class="step-number">STEP 04</span>
+          <span class="step-title">Upgrade to ARP Scanning with Scapy</span>
+        </div>
+        <div class="step-body">
+          <p>Move beyond ICMP. ARP scanning is more reliable for local network discovery — it works even when hosts are configured to block ping. Scapy gives you the low-level packet crafting capability to do this properly.</p>
+
+          <div class="terminal">
+            <div class="terminal-bar">
+              <span class="t-dot red"></span><span class="t-dot yellow"></span><span class="t-dot green"></span>
+              <span class="t-label">TERMINAL</span>
+            </div>
+            <pre><span class="prompt">$</span> <span class="cmd">python3 -m venv scanner-env</span>
+<span class="prompt">$</span> <span class="cmd">source scanner-env/bin/activate</span>
+<span class="prompt">(scanner-env) $</span> <span class="cmd">pip install scapy netifaces</span></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-bar">
+              <span class="cb-icon">◈</span>
+              <span class="cb-label">PYTHON · arp_host_scanner.py</span>
+            </div>
+            <pre><span class="comment"># ARP-based local network discovery using Scapy</span>
+<span class="kw">from</span> scapy.all <span class="kw">import</span> ARP, Ether, srp
+<span class="kw">import</span> netifaces
+
+<span class="kw">def</span> <span class="func">arp_scan</span>(network):
+    arp    = <span class="cls">ARP</span>(pdst=network)
+    ether  = <span class="cls">Ether</span>(dst=<span class="str">"ff:ff:ff:ff:ff:ff"</span>)
+    packet = ether / arp
+
+    result  = <span class="func">srp</span>(packet, timeout=<span class="num">3</span>, verbose=<span class="num">0</span>)[<span class="num">0</span>]
+    devices = []
+
+    <span class="kw">for</span> sent, received <span class="kw">in</span> result:
+        devices.<span class="func">append</span>({
+            <span class="str">'ip'</span>:  received.psrc,
+            <span class="str">'mac'</span>: received.hwsrc
+        })
+
+    <span class="kw">return</span> devices</pre>
+          </div>
+
+          <p>ARP operates at Layer 2 — it reaches devices that don't respond to ICMP, and it returns MAC addresses alongside IPs, giving you vendor identification capability when cross-referenced against an OUI database.</p>
+        </div>
+      </div>
+
+      <!-- STEP 5 -->
+      <div class="step-card">
+        <div class="step-header">
+          <span class="step-number">STEP 05</span>
+          <span class="step-title">Resolve Permissions and Virtual Environment Access</span>
+        </div>
+        <div class="step-body">
+          <p>ARP scanning requires raw socket access — which means root privileges. The trick is to invoke the virtual environment's Python interpreter directly via <code>sudo</code>, rather than relying on the system Python. This preserves your venv libraries while running with elevated permissions.</p>
+
+          <div class="terminal">
+            <div class="terminal-bar">
+              <span class="t-dot red"></span><span class="t-dot yellow"></span><span class="t-dot green"></span>
+              <span class="t-label">TERMINAL</span>
+            </div>
+            <pre><span class="comment"># Run the scanner with root privileges using the venv interpreter</span>
+<span class="prompt">$</span> <span class="cmd">sudo ./scanner-env/bin/python arp_host_scanner.py</span></pre>
+          </div>
+
+          <div class="callout">
+            <p>Running <code>sudo python3</code> directly would use the system Python, bypassing your virtual environment. Always point sudo at the venv interpreter explicitly when elevated access is required.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 6 -->
+      <div class="step-card">
+        <div class="step-header">
+          <span class="step-number">STEP 06</span>
+          <span class="step-title">Enhance with Hostname Resolution</span>
+        </div>
+        <div class="step-body">
+          <p>IP addresses and MAC addresses tell you where something is. Hostnames tell you what it is. Add reverse DNS lookups to make your scan output immediately interpretable — no manual cross-referencing required.</p>
+
+          <div class="code-block">
+            <div class="code-bar">
+              <span class="cb-icon">◈</span>
+              <span class="cb-label">PYTHON · hostname_resolution.py</span>
+            </div>
+            <pre><span class="kw">import</span> socket
+
+<span class="kw">def</span> <span class="func">resolve_hostname</span>(ip):
+    <span class="kw">try</span>:
+        <span class="comment"># Attempt reverse DNS lookup</span>
+        <span class="kw">return</span> socket.<span class="func">gethostbyaddr</span>(ip)[<span class="num">0</span>]
+    <span class="kw">except</span> socket.herror:
+        <span class="comment"># No PTR record — return Unknown rather than crashing</span>
+        <span class="kw">return</span> <span class="str">'Unknown'</span></pre>
+          </div>
+
+          <p>Not all devices will have PTR records — embedded systems, PLCs, and IoT devices often don't. The <code>try/except</code> ensures the scanner keeps running when lookups fail rather than terminating mid-scan.</p>
+        </div>
+      </div>
+
+      <!-- STEP 7 -->
+      <div class="step-card">
+        <div class="step-header">
+          <span class="step-number">STEP 07</span>
+          <span class="step-title">Validate and Log Results</span>
+        </div>
+        <div class="step-body">
+          <p>Scan results are only useful if you can compare them across time. Log every scan to a timestamped file — this gives you a baseline to diff against, making new or unauthorized devices immediately visible in future runs.</p>
+
+          <div class="code-block">
+            <div class="code-bar">
+              <span class="cb-icon">◈</span>
+              <span class="cb-label">PYTHON · scan_logger.py</span>
+            </div>
+            <pre><span class="kw">import</span> datetime
+<span class="kw">import</span> os
+
+<span class="comment"># Ensure logs directory exists</span>
+os.<span class="func">makedirs</span>(<span class="str">"logs"</span>, exist_ok=<span class="kw">True</span>)
+
+<span class="comment"># Generate a timestamped filename for this scan</span>
+log_filename = datetime.datetime.<span class="func">now</span>().<span class="func">strftime</span>(
+    <span class="str">"logs/scan_%Y%m%d_%H%M%S.txt"</span>
+)
+
+<span class="kw">with</span> <span class="builtin">open</span>(log_filename, <span class="str">'w'</span>) <span class="kw">as</span> log_file:
+    <span class="kw">for</span> device <span class="kw">in</span> devices:
+        hostname = <span class="func">resolve_hostname</span>(device[<span class="str">'ip'</span>])
+        log_file.<span class="func">write</span>(
+            <span class="str">f"IP: </span>{device[<span class="str">'ip'</span>]}<span class="str">  MAC: </span>{device[<span class="str">'mac'</span>]}<span class="str">  Hostname: </span>{hostname}<span class="str">\n"</span>
+        )
+
+<span class="builtin">print</span>(<span class="str">f"Scan logged to: </span>{log_filename}<span class="str">"</span>)</pre>
+          </div>
+
+          <p>With timestamped logs in place, you can diff any two scan files to see exactly what changed — which devices appeared, which disappeared, and which changed their MAC address (a classic indicator of a spoofing attempt or a rogue device replacement).</p>
+        </div>
+      </div>
+
+      <!-- What's Next -->
+      <div class="next-block">
+        <span class="nb-label">// WHAT'S NEXT — BUILDING TOWARD A MINI BLUE-TEAM SOC LAB</span>
+        <h3>This Environment Is a Foundation, Not a Destination</h3>
+        <ul>
+          <li>Compare timestamped scan logs to identify new or unauthorized devices automatically</li>
+          <li>Analyze network trend data using Jupyter notebooks — visualize device population over time</li>
+          <li>Integrate AI/ML for anomaly detection and alerting on behavioral deviations</li>
+          <li>Extend the scanner to pull OUI vendor data from MAC addresses for device fingerprinting</li>
+          <li>Feed results into a SIEM (Elastic or Splunk) to correlate with other data sources</li>
+        </ul>
+      </div>
+
+    </div><!-- /.article-body -->
+
+    <!-- Author Bio -->
+    <div class="author-bio">
+      <div class="bio-initials">NC</div>
+      <div class="bio-text">
+        <h4>Norris Cornell</h4>
+        <p>Nearly 20 years as an electronics technician, now working at the intersection of cyber-physical systems and critical infrastructure defense. IAM Technical Lead in the financial sector. Master's in SCADA Cybersecurity, Wilmington University. BSides Delaware organizer since 2015.</p>
+      </div>
+    </div>
+
+    <!-- Copyright -->
+    <div class="article-copyright">
+      <p>© 2024 Norris Cornell. All Rights Reserved.</p>
+      <p>This article is the intellectual property of Norris Cornell. Reproduction, redistribution, or use in any form without prior written permission is prohibited.</p>
+    </div>
+
+  </article>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">CORNELL <span>SECURITY</span></div>
+    <div class="footer-copy">© 2026 NORRIS CORNELL · ALL RIGHTS RESERVED</div>
+  </div>
+  <div class="footer-legal">
+    All content, research, frameworks, and written works published on this site are the intellectual property of Norris Cornell
+    and are protected by copyright. Reproduction, redistribution, or use in any form without prior written permission is prohibited.
+  </div>
+</footer>
+
+</body>
+</html>

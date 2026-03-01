@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Asset Visibility in OT Environments: Why You Can't Defend What You Don't See — Cornell Security</title>
+  <meta name="description" content="Asset visibility is the bedrock of ICS cybersecurity. Why it's harder in OT than IT, how passive discovery works, and how to build an inventory that actually supports defense.">
+  <meta name="author" content="Norris Cornell">
+  <meta name="copyright" content="© 2024 Norris Cornell. All Rights Reserved.">
+  <link rel="canonical" href="https://cornellsecurity.com/blog/ot-asset-visibility.html">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .article-wrapper { max-width: 800px; margin: 0 auto; padding: 3rem 2rem 5rem; }
+    .article-header { margin-bottom: 3rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
+    .article-header h1 { font-family: var(--font-heading); font-size: clamp(1.7rem, 3.2vw, 2.4rem); font-weight: 700; color: #fff; line-height: 1.2; letter-spacing: 0.03em; margin-bottom: 1.25rem; }
+    .article-meta { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; margin-bottom: 0.75rem; }
+    .article-meta span { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); letter-spacing: 0.1em; }
+    .article-meta .meta-author { color: var(--accent-cyan); }
+    .category-badge { display: inline-block; font-family: var(--font-mono); font-size: 0.68rem; color: var(--accent-cyan); background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.2); padding: 0.3rem 0.75rem; border-radius: var(--radius); letter-spacing: 0.12em; margin-bottom: 1rem; }
+
+    .article-body h2 { font-family: var(--font-heading); font-size: 1.45rem; font-weight: 700; color: #fff; letter-spacing: 0.04em; margin: 2.75rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+    .article-body h3 { font-family: var(--font-heading); font-size: 1.05rem; font-weight: 600; color: var(--accent-cyan); letter-spacing: 0.06em; margin: 1.75rem 0 0.6rem; }
+    .article-body p { color: var(--text-secondary); font-size: 0.98rem; line-height: 1.85; margin-bottom: 1.15rem; }
+    .article-body strong { color: var(--text-primary); font-weight: 600; }
+    .article-body ul { color: var(--text-secondary); font-size: 0.97rem; line-height: 1.85; padding-left: 1.5rem; margin-bottom: 1.25rem; }
+    .article-body ul li { margin-bottom: 0.55rem; }
+
+    /* Key principle block */
+    .principle-block {
+      background: var(--bg-deep);
+      border: 1px solid var(--border-accent);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin-bottom: 2.5rem;
+      text-align: center;
+    }
+    .principle-block .principle-text {
+      font-family: var(--font-heading);
+      font-size: clamp(1.2rem, 2.6vw, 1.7rem);
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.04em;
+      line-height: 1.35;
+      margin-bottom: 0.75rem;
+    }
+    .principle-block p { color: var(--text-muted); font-size: 0.92rem; margin: 0; line-height: 1.7; }
+
+    /* Callouts */
+    .callout { background: rgba(0,212,255,0.05); border-left: 3px solid var(--accent-cyan); padding: 1rem 1.25rem; margin: 1.75rem 0; border-radius: 0 var(--radius) var(--radius) 0; }
+    .callout p { margin: 0; color: var(--text-primary); font-size: 1.02rem; font-style: italic; line-height: 1.7; }
+    .callout-red { border-left-color: var(--accent-red); background: rgba(255,71,87,0.05); }
+    .callout-green { border-left-color: var(--accent-green); background: rgba(0,255,159,0.05); }
+
+    /* Challenges grid */
+    .challenge-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1.75rem 0;
+    }
+    @media (max-width: 580px) { .challenge-grid { grid-template-columns: 1fr; } }
+    .challenge-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent-red);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      padding: 1.1rem 1.25rem;
+    }
+    .challenge-card h4 { font-family: var(--font-heading); font-size: 0.92rem; font-weight: 700; color: #fff; margin-bottom: 0.4rem; }
+    .challenge-card p { font-size: 0.86rem; color: var(--text-muted); line-height: 1.6; margin: 0; }
+
+    /* Case study */
+    .case-study {
+      background: var(--bg-card);
+      border: 1px solid rgba(255,71,87,0.3);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin: 1.75rem 0;
+    }
+    .case-study .cs-label {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      color: var(--accent-red);
+      letter-spacing: 0.14em;
+      display: block;
+      margin-bottom: 0.6rem;
+    }
+    .case-study h4 { font-family: var(--font-heading); font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 0.75rem; }
+    .case-study p { font-size: 0.92rem; color: var(--text-secondary); line-height: 1.75; margin-bottom: 0.75rem; }
+    .case-study p:last-child { margin-bottom: 0; }
+    .case-study .cs-lesson {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--accent-red);
+      background: rgba(255,71,87,0.06);
+      border: 1px solid rgba(255,71,87,0.15);
+      border-radius: var(--radius);
+      padding: 0.6rem 1rem;
+      margin-top: 0.75rem;
+      display: block;
+      line-height: 1.6;
+    }
+
+    /* Tool table */
+    .tool-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.75rem 0;
+      font-size: 0.87rem;
+    }
+    .tool-table th {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      text-align: left;
+      padding: 0.6rem 0.9rem;
+      background: var(--bg-deep);
+      border-bottom: 1px solid var(--border-accent);
+    }
+    .tool-table td {
+      padding: 0.75rem 0.9rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-secondary);
+      vertical-align: top;
+      line-height: 1.6;
+    }
+    .tool-table tr:last-child td { border-bottom: none; }
+    .tool-table .td-tool { color: var(--accent-cyan); font-family: var(--font-mono); font-size: 0.8rem; white-space: nowrap; }
+    .tool-table .td-free { color: var(--accent-green); font-family: var(--font-mono); font-size: 0.75rem; }
+    .tool-table .td-commercial { color: var(--text-muted); font-family: var(--font-mono); font-size: 0.75rem; }
+
+    /* How-it-works steps */
+    .steps { display: flex; flex-direction: column; gap: 0; margin: 1.5rem 0; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    .step-row {
+      display: flex;
+      gap: 0;
+      align-items: stretch;
+      border-bottom: 1px solid var(--border);
+    }
+    .step-row:last-child { border-bottom: none; }
+    .step-num-col {
+      background: var(--bg-deep);
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 3.5rem;
+      border-right: 1px solid var(--border);
+    }
+    .step-num-col span { font-family: var(--font-mono); font-size: 0.78rem; color: var(--accent-cyan); letter-spacing: 0.1em; }
+    .step-content { padding: 0.9rem 1.25rem; }
+    .step-content p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.7; margin: 0; }
+
+    /* Best practices list */
+    .practice-list { display: flex; flex-direction: column; gap: 0.8rem; margin: 1.5rem 0; }
+    .practice-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.9rem 1.25rem;
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+    .practice-icon { color: var(--accent-green); font-size: 1rem; flex-shrink: 0; margin-top: 0.1rem; }
+    .practice-item p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.65; margin: 0; }
+    .practice-item strong { color: var(--text-primary); }
+
+    /* Threat tactic */
+    .tactic-block {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      margin: 1.5rem 0;
+    }
+    .tactic-block .tactic-label { font-family: var(--font-mono); font-size: 0.66rem; color: var(--accent-red); letter-spacing: 0.14em; display: block; margin-bottom: 0.75rem; }
+    .tactic-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    @media (max-width: 560px) { .tactic-grid { grid-template-columns: 1fr; } }
+    .tactic-item { font-size: 0.87rem; color: var(--text-muted); line-height: 1.55; }
+    .tactic-item strong { color: var(--text-secondary); display: block; margin-bottom: 0.2rem; font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.06em; }
+
+    /* Detection techniques */
+    .detection-steps { display: flex; flex-direction: column; gap: 0.75rem; margin: 1.5rem 0; }
+    .detection-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent-green);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      padding: 0.9rem 1.25rem;
+    }
+    .detection-item p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.65; margin: 0; }
+    .detection-item strong { color: var(--text-primary); }
+
+    /* Framework reference */
+    .framework-ref {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: rgba(0,212,255,0.05);
+      border: 1px solid rgba(0,212,255,0.2);
+      border-radius: var(--radius);
+      padding: 0.5rem 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--accent-cyan);
+      letter-spacing: 0.08em;
+      margin: 0.25rem 0.25rem 0.25rem 0;
+      vertical-align: middle;
+    }
+
+    /* Closing block */
+    .closing-block {
+      background: var(--bg-deep);
+      border: 1px solid var(--border-accent);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin: 2.5rem 0;
+    }
+    .closing-block h3 { font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; color: #fff; letter-spacing: 0.04em; margin-bottom: 0.75rem; }
+    .closing-block p { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.8; margin-bottom: 0.75rem; }
+    .closing-block p:last-child { margin-bottom: 0; }
+    .closing-block strong { color: var(--accent-cyan); }
+
+    /* Author bio */
+    .author-bio {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-top: 2.5rem;
+      display: flex;
+      gap: 1.25rem;
+      align-items: flex-start;
+    }
+    .author-bio .bio-initials {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      background: rgba(0,212,255,0.08);
+      border: 1px solid rgba(0,212,255,0.2);
+      border-radius: 50%;
+      width: 48px; height: 48px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .author-bio .bio-text h4 { font-family: var(--font-heading); font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 0.3rem; }
+    .author-bio .bio-text p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.65; margin: 0; }
+
+    /* Copyright */
+    .article-copyright {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+    .back-link { display: inline-block; font-family: var(--font-mono); font-size: 0.78rem; color: var(--accent-cyan); text-decoration: none; letter-spacing: 0.08em; margin-bottom: 2rem; }
+    .back-link:hover { color: #fff; }
+    .connect-link { color: var(--accent-cyan); text-decoration: none; }
+    .connect-link:hover { color: #fff; text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-container">
+    <a href="../index.html" class="nav-brand">
+      <span class="brand-icon">◈</span>
+      <span>CORNELL <span class="brand-accent">SECURITY</span></span>
+    </a>
+    <div class="nav-links" id="navLinks">
+      <a href="../about.html">ABOUT</a>
+      <a href="../research.html">RESEARCH</a>
+      <a href="../blog.html" class="active">BLOG</a>
+      <a href="../contact.html">CONTACT</a>
+    </div>
+    <button class="nav-toggle" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
+  </div>
+</nav>
+
+<div class="page-wrapper">
+  <article class="article-wrapper">
+
+    <a href="../blog.html" class="back-link">← BACK TO BLOG</a>
+
+    <header class="article-header">
+      <span class="category-badge">ICS/OT Fundamentals</span>
+      <h1>Asset Visibility in OT Environments: Why You Can't Defend What You Don't See</h1>
+      <div class="article-meta">
+        <span class="meta-author">Norris Cornell</span>
+        <span>·</span>
+        <span>ICS/OT Security</span>
+        <span>·</span>
+        <span>Asset Management</span>
+        <span>·</span>
+        <span>Critical Infrastructure</span>
+      </div>
+    </header>
+
+    <div class="article-body">
+
+      <div class="principle-block">
+        <div class="principle-text">Visibility isn't nice to have in OT security. It's non-negotiable.</div>
+        <p>If you don't know what assets exist on your industrial network, you can't protect them. You can't patch them. You can't monitor their behavior. And you can't detect when something goes wrong.</p>
+      </div>
+
+      <p>Asset visibility is the bedrock of any effective ICS cybersecurity strategy. Yet in many critical infrastructure environments, it remains one of the most overlooked and underdeveloped components of cyber hygiene. This post explores why asset visibility is so challenging in OT, how to implement it safely, and the tools and frameworks that can help.</p>
+
+      <h2>The Visibility Gap in Industrial Networks</h2>
+
+      <p>Traditional IT environments typically have robust visibility. From asset management platforms to endpoint detection agents, most organizations have some degree of insight into what's on their networks. OT environments are a different story.</p>
+
+      <p>Industrial networks often consist of decades-old systems, proprietary protocols, and "flat" architectures with little to no segmentation. Many assets — like programmable logic controllers (PLCs), human-machine interfaces (HMIs), and data historians — were never designed with cybersecurity in mind. They often lack logging, encryption, and even basic authentication mechanisms.</p>
+
+      <h3>Why Asset Discovery Is Difficult in OT</h3>
+
+      <div class="challenge-grid">
+        <div class="challenge-card">
+          <h4>Active Scanning Is Risky</h4>
+          <p>Conventional tools like Nmap or Nessus can crash fragile devices. The same probe that returns a banner on an IT server can cause a PLC to fault or reboot.</p>
+        </div>
+        <div class="challenge-card">
+          <h4>Proprietary Protocols</h4>
+          <p>Vendors use unique communication standards — Modbus, DNP3, EtherNet/IP, PROFINET — making deep inspection without specialized parsers difficult or impossible.</p>
+        </div>
+        <div class="challenge-card">
+          <h4>Air-Gap Assumptions</h4>
+          <p>Many environments still operate under the illusion of isolation. "Air-gapped" systems are often not as separated as assumed — and even true air gaps don't eliminate the need for asset awareness.</p>
+        </div>
+        <div class="challenge-card">
+          <h4>Lack of Inventory Discipline</h4>
+          <p>New devices get added without documentation or centralized oversight. A technician installs a device in the field; it never makes it into the asset register.</p>
+        </div>
+      </div>
+
+      <h2>Case Study: Colonial Pipeline</h2>
+
+      <div class="case-study">
+        <span class="cs-label">CASE STUDY · 2021 — COLONIAL PIPELINE RANSOMWARE ATTACK</span>
+        <h4>What Poor Visibility Looks Like at Scale</h4>
+        <p>The Colonial Pipeline ransomware attack is a high-profile example of how dangerous poor asset visibility can be. Attackers gained access to Colonial Pipeline's IT network using a compromised VPN password for an <strong>unused account</strong> that lacked multifactor authentication.</p>
+        <p>Although the ransomware did not spread into OT systems, the company made the decision to shut down its entire pipeline operation out of caution and uncertainty — highlighting a major lack of confidence in their visibility and segmentation between IT and OT networks.</p>
+        <p>The shutdown led to widespread fuel shortages and price spikes along the East Coast, demonstrating how a cyber incident in the business network can cascade into massive real-world consequences when visibility is incomplete.</p>
+        <span class="cs-lesson">
+          Key lesson: Without full awareness of what systems are connected and how they communicate, organizations in critical infrastructure may be left in the dark when it matters most — even when the OT systems themselves weren't directly compromised.
+        </span>
+      </div>
+
+      <h2>Passive Discovery: The Gold Standard for OT</h2>
+
+      <p>To gain visibility without disrupting operations, passive monitoring is the right approach. Instead of probing devices directly, these tools listen to network traffic, identify devices and protocols in use, and build a picture of the environment over time.</p>
+
+      <h3>Recommended Tools</h3>
+
+      <table class="tool-table">
+        <thead>
+          <tr>
+            <th>TOOL</th>
+            <th>TYPE</th>
+            <th>PRIMARY USE</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-tool">Nozomi Networks</td>
+            <td class="td-commercial">Commercial</td>
+            <td>Purpose-built OT/ICS asset visibility and anomaly detection with broad protocol support</td>
+          </tr>
+          <tr>
+            <td class="td-tool">Claroty</td>
+            <td class="td-commercial">Commercial</td>
+            <td>Industrial asset inventory with deep protocol inspection and integration into SIEM/CMDB</td>
+          </tr>
+          <tr>
+            <td class="td-tool">Dragos</td>
+            <td class="td-commercial">Commercial</td>
+            <td>ICS-focused threat detection, asset visibility, and incident response — built by ICS practitioners</td>
+          </tr>
+          <tr>
+            <td class="td-tool">Zeek (formerly Bro)</td>
+            <td class="td-free">Open Source</td>
+            <td>Powerful passive network analyzer; ICS protocol support via plugins (Modbus, DNP3, EtherNet/IP)</td>
+          </tr>
+          <tr>
+            <td class="td-tool">Arkime</td>
+            <td class="td-free">Open Source</td>
+            <td>Packet capture and search platform for in-depth network traffic inspection and retention</td>
+          </tr>
+          <tr>
+            <td class="td-tool">Wireshark</td>
+            <td class="td-free">Open Source</td>
+            <td>Protocol-level packet analysis including Modbus, DNP3, and OPC-UA — essential for manual investigation</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>How Passive Discovery Works</h3>
+
+      <div class="steps">
+        <div class="step-row">
+          <div class="step-num-col"><span>01</span></div>
+          <div class="step-content">
+            <p>Configure <strong>SPAN ports, TAPs, or mirror ports</strong> on industrial switches to copy traffic to a dedicated collection interface without touching endpoint devices.</p>
+          </div>
+        </div>
+        <div class="step-row">
+          <div class="step-num-col"><span>02</span></div>
+          <div class="step-content">
+            <p>Feed mirrored traffic to <strong>passive sensors or a dedicated collection server</strong> running your chosen analysis tools.</p>
+          </div>
+        </div>
+        <div class="step-row">
+          <div class="step-num-col"><span>03</span></div>
+          <div class="step-content">
+            <p>Tools <strong>parse traffic and fingerprint devices</strong> by IP address, MAC address, vendor, protocol in use, and firmware version — building an asset picture without touching endpoints.</p>
+          </div>
+        </div>
+        <div class="step-row">
+          <div class="step-num-col"><span>04</span></div>
+          <div class="step-content">
+            <p>Over time, the tool builds a <strong>dynamic, evolving asset inventory</strong> that reflects the actual state of the network rather than documentation that may be years out of date.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout callout-green">
+        <p>Passive discovery is the only safe approach for most OT environments. Read the traffic — don't probe the devices. The network will tell you everything you need to know.</p>
+      </div>
+
+      <h2>Building and Maintaining an OT Asset Inventory</h2>
+
+      <p>Discovery is just the start. To be useful for cyber defense, visibility must translate into a structured and up-to-date asset inventory. The inventory is only valuable if it's accurate, current, and actionable.</p>
+
+      <div class="practice-list">
+        <div class="practice-item">
+          <span class="practice-icon">◈</span>
+          <p><strong>Tag criticality.</strong> Classify assets based on their impact on safety, operations, or business continuity. Not every device carries equal risk — prioritize your protective effort accordingly.</p>
+        </div>
+        <div class="practice-item">
+          <span class="practice-icon">◈</span>
+          <p><strong>Track firmware and software versions.</strong> Essential for identifying vulnerable components when advisories are published. A PLC running five-year-old firmware you don't know about is a silent liability.</p>
+        </div>
+        <div class="practice-item">
+          <span class="practice-icon">◈</span>
+          <p><strong>Use CMDBs or EAM systems.</strong> Centralize your data so that it feeds into risk management and SOC workflows. Passive discovery output should flow into your inventory automatically, not require manual transcription.</p>
+        </div>
+        <div class="practice-item">
+          <span class="practice-icon">◈</span>
+          <p><strong>Automate updates where possible.</strong> Sync passive discovery data into your inventory system regularly. A static inventory is a false confidence. The network changes; your inventory must change with it.</p>
+        </div>
+      </div>
+
+      <div class="callout">
+        <p>The NIST Cybersecurity Framework (CSF) emphasizes this in the <strong>Identify</strong> function — the first and foundational step. You can't protect, detect, respond, or recover without first knowing what you have.</p>
+      </div>
+
+      <h2>Detecting Rogue and Undocumented Devices</h2>
+
+      <p>Even with a solid asset inventory, you must remain alert for changes — especially unexpected or unauthorized ones. Threat actors may introduce devices into your environment that never appear in documentation.</p>
+
+      <div class="tactic-block">
+        <span class="tactic-label">ADVERSARY TACTICS — UNAUTHORIZED DEVICE INTRODUCTION</span>
+        <div class="tactic-grid">
+          <div class="tactic-item">
+            <strong>ROGUE ENGINEERING LAPTOPS</strong>
+            Introduced by contractors or attackers with physical access; used to connect directly to engineering networks.
+          </div>
+          <div class="tactic-item">
+            <strong>UNMANAGED NETWORK PORTS</strong>
+            Physical ports in equipment rooms, substations, or remote sites that are unplugged but reachable — easy insertion points.
+          </div>
+          <div class="tactic-item">
+            <strong>COVERT RELAY DEVICES</strong>
+            Small single-board computers (e.g., Raspberry Pi) installed inline or on a tap to intercept or relay traffic without disrupting the connection.
+          </div>
+          <div class="tactic-item">
+            <strong>MITRE ATT&CK FOR ICS</strong>
+            <span style="color:var(--accent-red);">T0809: Rogue Master</span> — adversary device poses as a legitimate master device to issue unauthorized commands to field devices.
+          </div>
+        </div>
+      </div>
+
+      <h3>Detection Techniques</h3>
+
+      <div class="detection-steps">
+        <div class="detection-item">
+          <p><strong>Establish a communication baseline.</strong> Know what normal traffic looks like — which devices talk to which, what protocols they use, and what volumes are expected. Deviation from baseline is your first signal.</p>
+        </div>
+        <div class="detection-item">
+          <p><strong>Alert on new MAC addresses.</strong> Any device that appears on the network with a previously unseen MAC address should trigger an investigation, not a ticket. In OT environments, new devices are rare and should always be expected.</p>
+        </div>
+        <div class="detection-item">
+          <p><strong>Monitor for unusual protocol use or port scans.</strong> Passive tools should flag any host attempting to probe or query devices it doesn't normally communicate with — a strong indicator of reconnaissance or lateral movement.</p>
+        </div>
+        <div class="detection-item">
+          <p><strong>Ingest logs into a SIEM.</strong> Platforms like Splunk or Elastic can correlate passive discovery alerts, firewall logs, and historian data to surface anomalies that no single tool would catch in isolation.</p>
+        </div>
+      </div>
+
+      <p>By continuously monitoring for deviation, you turn passive discovery from a one-time inventory exercise into a proactive defense mechanism — one that generates alerts when the environment changes in unexpected ways.</p>
+
+      <h2>Visibility Is the First Step Toward Control</h2>
+
+      <div class="closing-block">
+        <h3>The Foundation Everything Else Is Built On</h3>
+        <p>In ICS and OT environments, asset visibility isn't a one-time project — it's a continuous process that forms the foundation of every other security initiative. Without it, <strong>segmentation is blind</strong>, <strong>threat detection is unreliable</strong>, and <strong>incident response is incomplete</strong>.</p>
+        <p>If your organization is still operating in the dark, start with passive discovery. Build an inventory. Map criticality. Monitor for change. These are not glamorous capabilities — but they are the ones that determine whether every other investment in OT security actually works.</p>
+        <p><strong>You can't defend what you don't see — but once you do see it, you can take meaningful, risk-based action.</strong></p>
+      </div>
+
+      <p>I'm interested in connecting with defenders, researchers, and organizations working on asset visibility challenges in critical infrastructure. If you're addressing these gaps in your environment, <a href="https://www.linkedin.com/in/norriscornell" class="connect-link" target="_blank" rel="noopener">connect on LinkedIn</a> — I'm always interested in talking with people thinking seriously about ICS resilience.</p>
+
+    </div><!-- /.article-body -->
+
+    <!-- Author Bio -->
+    <div class="author-bio">
+      <div class="bio-initials">NC</div>
+      <div class="bio-text">
+        <h4>Norris Cornell</h4>
+        <p>Nearly 20 years as an electronics technician, now working at the intersection of cyber-physical systems and critical infrastructure security. Master's in SCADA Cybersecurity, Wilmington University. IAM Technical Lead in the financial sector. BSides Delaware organizer since 2015. DoD Secret clearance holder.</p>
+      </div>
+    </div>
+
+    <!-- Copyright -->
+    <div class="article-copyright">
+      <p>© 2024 Norris Cornell. All Rights Reserved.</p>
+      <p>This article is the intellectual property of Norris Cornell. Reproduction, redistribution, or use in any form without prior written permission is prohibited.</p>
+    </div>
+
+  </article>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">CORNELL <span>SECURITY</span></div>
+    <div class="footer-copy">© 2026 NORRIS CORNELL · ALL RIGHTS RESERVED</div>
+  </div>
+  <div class="footer-legal">
+    All content, research, frameworks, and written works published on this site are the intellectual property of Norris Cornell
+    and are protected by copyright. Reproduction, redistribution, or use in any form without prior written permission is prohibited.
+  </div>
+</footer>
+
+</body>
+</html>

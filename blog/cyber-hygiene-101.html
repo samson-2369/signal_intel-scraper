@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cyber Hygiene 101: What NIST Says About Keeping Your Digital Footprint Clean — Cornell Security</title>
+  <meta name="description" content="MFA, strong passwords, patching, and secure configurations aren't optional — they're survival. MGM's $100M breach proves it. Key NIST SP 800-53 controls explained for businesses and individuals.">
+  <meta name="author" content="Norris Cornell">
+  <meta name="copyright" content="© 2024 Norris Cornell. All Rights Reserved.">
+  <link rel="canonical" href="https://cornellsecurity.com/blog/cyber-hygiene-101.html">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .article-wrapper { max-width: 800px; margin: 0 auto; padding: 3rem 2rem 5rem; }
+    .article-header { margin-bottom: 3rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
+    .article-header h1 { font-family: var(--font-heading); font-size: clamp(1.7rem, 3.2vw, 2.4rem); font-weight: 700; color: #fff; line-height: 1.2; letter-spacing: 0.03em; margin-bottom: 1.25rem; }
+    .article-header .subtitle { font-size: 1rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1.25rem; }
+    .article-meta { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
+    .article-meta span { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); letter-spacing: 0.1em; }
+    .article-meta .meta-author { color: var(--accent-cyan); }
+    .category-badge { display: inline-block; font-family: var(--font-mono); font-size: 0.68rem; color: var(--accent-cyan); background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.2); padding: 0.3rem 0.75rem; border-radius: var(--radius); letter-spacing: 0.12em; margin-bottom: 1rem; }
+
+    .article-body h2 { font-family: var(--font-heading); font-size: 1.4rem; font-weight: 700; color: #fff; letter-spacing: 0.04em; margin: 2.75rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+    .article-body h3 { font-family: var(--font-heading); font-size: 1.05rem; font-weight: 600; color: var(--accent-cyan); letter-spacing: 0.06em; margin: 1.75rem 0 0.6rem; }
+    .article-body p { color: var(--text-secondary); font-size: 0.98rem; line-height: 1.85; margin-bottom: 1.15rem; }
+    .article-body strong { color: var(--text-primary); font-weight: 600; }
+
+    /* Hook opener */
+    .hook-block {
+      background: var(--bg-deep);
+      border: 1px solid var(--border-accent);
+      border-radius: var(--radius);
+      padding: 1.75rem 2rem;
+      margin-bottom: 2rem;
+    }
+    .hook-block p { color: var(--text-secondary); font-size: 0.97rem; line-height: 1.85; margin-bottom: 0.75rem; }
+    .hook-block p:last-child { margin-bottom: 0; }
+    .hook-block strong { color: var(--accent-cyan); }
+
+    /* Callouts */
+    .callout { background: rgba(0,212,255,0.05); border-left: 3px solid var(--accent-cyan); padding: 1rem 1.25rem; margin: 1.5rem 0; border-radius: 0 var(--radius) var(--radius) 0; }
+    .callout p { margin: 0; color: var(--text-primary); font-size: 0.97rem; line-height: 1.7; }
+    .callout-red { border-left-color: var(--accent-red); background: rgba(255,71,87,0.05); }
+    .callout-green { border-left-color: var(--accent-green); background: rgba(0,255,159,0.05); }
+    .callout-yellow { border-left-color: #f5a623; background: rgba(245,166,35,0.05); }
+
+    /* MGM stat banner */
+    .stat-banner {
+      background: rgba(255,71,87,0.06);
+      border: 1px solid rgba(255,71,87,0.3);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+      margin: 1.75rem 0;
+      text-align: center;
+    }
+    .stat-banner .big-num {
+      font-family: var(--font-heading);
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      font-weight: 700;
+      color: var(--accent-red);
+      letter-spacing: 0.02em;
+      line-height: 1;
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+    .stat-banner .stat-label {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      letter-spacing: 0.14em;
+      display: block;
+    }
+    .stat-row { display: flex; justify-content: center; gap: 2.5rem; flex-wrap: wrap; margin-top: 1.25rem; }
+    .stat-item { text-align: center; }
+    .stat-item .si-val { font-family: var(--font-heading); font-size: 1.2rem; font-weight: 700; color: #fff; display: block; }
+    .stat-item .si-label { font-family: var(--font-mono); font-size: 0.66rem; color: var(--text-muted); letter-spacing: 0.1em; }
+
+    /* Case study */
+    .case-study {
+      background: var(--bg-card);
+      border: 1px solid rgba(255,71,87,0.25);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin: 1.75rem 0;
+    }
+    .case-study .cs-label { font-family: var(--font-mono); font-size: 0.66rem; color: var(--accent-red); letter-spacing: 0.14em; display: block; margin-bottom: 0.6rem; }
+    .case-study h4 { font-family: var(--font-heading); font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 0.75rem; }
+    .case-study .cs-steps { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 0.75rem; }
+    .cs-step { display: flex; gap: 0.75rem; align-items: flex-start; }
+    .cs-step .step-n { font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent-red); min-width: 1.5rem; flex-shrink: 0; margin-top: 0.1rem; }
+    .cs-step p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.7; margin: 0; }
+
+    /* NIST section */
+    .nist-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin: 1.75rem 0;
+    }
+    .nist-header {
+      background: var(--bg-deep);
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .nist-num { font-family: var(--font-mono); font-size: 0.68rem; color: var(--accent-cyan); background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.2); border-radius: var(--radius); padding: 0.2rem 0.6rem; flex-shrink: 0; }
+    .nist-title { font-family: var(--font-heading); font-size: 1.05rem; font-weight: 700; color: #fff; }
+    .nist-ref { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-muted); letter-spacing: 0.1em; margin-left: auto; white-space: nowrap; }
+    .nist-body { padding: 1.25rem 1.5rem; }
+    .nist-body p { font-size: 0.92rem; color: var(--text-secondary); line-height: 1.8; margin-bottom: 0.75rem; }
+    .nist-body p:last-child { margin-bottom: 0; }
+
+    /* Audience split */
+    .audience-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1.25rem 0;
+    }
+    @media (max-width: 540px) { .audience-split { grid-template-columns: 1fr; } }
+    .audience-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .audience-card .ac-label {
+      padding: 0.5rem 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      letter-spacing: 0.14em;
+      display: block;
+    }
+    .audience-card.business .ac-label { background: rgba(0,212,255,0.07); color: var(--accent-cyan); border-bottom: 1px solid var(--border); }
+    .audience-card.personal .ac-label { background: rgba(0,255,159,0.06); color: var(--accent-green); border-bottom: 1px solid var(--border); }
+    .audience-card .ac-body { padding: 0.9rem 1rem; }
+    .audience-card .ac-body p { font-size: 0.87rem; color: var(--text-secondary); line-height: 1.7; margin: 0; }
+
+    /* Reality check */
+    .reality-check {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      background: rgba(0,212,255,0.04);
+      border: 1px solid rgba(0,212,255,0.15);
+      border-radius: var(--radius);
+      padding: 0.75rem 1rem;
+      margin: 1rem 0;
+    }
+    .reality-check .rc-label { font-family: var(--font-mono); font-size: 0.66rem; color: var(--accent-cyan); letter-spacing: 0.12em; flex-shrink: 0; margin-top: 0.1rem; }
+    .reality-check p { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.65; margin: 0; font-style: italic; }
+
+    /* Final checklists */
+    .checklist-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1.75rem 0;
+    }
+    @media (max-width: 560px) { .checklist-grid { grid-template-columns: 1fr; } }
+    .checklist-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .checklist-card .ck-header {
+      padding: 0.65rem 1.1rem;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      border-bottom: 1px solid var(--border);
+    }
+    .checklist-card.biz .ck-header { background: rgba(0,212,255,0.07); color: var(--accent-cyan); }
+    .checklist-card.personal .ck-header { background: rgba(0,255,159,0.06); color: var(--accent-green); }
+    .checklist-card ul { list-style: none; padding: 0.75rem 1.1rem; margin: 0; }
+    .checklist-card ul li {
+      display: flex;
+      gap: 0.6rem;
+      align-items: flex-start;
+      padding: 0.4rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      font-size: 0.87rem;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+    .checklist-card ul li:last-child { border-bottom: none; }
+    .checklist-card.biz ul li::before { content: "✓"; color: var(--accent-cyan); flex-shrink: 0; font-size: 0.8rem; }
+    .checklist-card.personal ul li::before { content: "✓"; color: var(--accent-green); flex-shrink: 0; font-size: 0.8rem; }
+
+    /* What's next */
+    .next-block {
+      background: var(--bg-deep);
+      border: 1px solid var(--border-accent);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin: 2.5rem 0;
+    }
+    .next-block .nb-label { font-family: var(--font-mono); font-size: 0.68rem; color: var(--accent-cyan); letter-spacing: 0.14em; display: block; margin-bottom: 0.75rem; }
+    .next-block p { font-size: 0.92rem; color: var(--text-secondary); line-height: 1.8; margin-bottom: 0.5rem; }
+    .next-block p:last-child { margin-bottom: 0; }
+    .next-block a { color: var(--accent-cyan); text-decoration: none; }
+    .next-block a:hover { color: #fff; text-decoration: underline; }
+
+    /* Author bio */
+    .author-bio {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-top: 2.5rem;
+      display: flex;
+      gap: 1.25rem;
+      align-items: flex-start;
+    }
+    .author-bio .bio-initials {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      background: rgba(0,212,255,0.08);
+      border: 1px solid rgba(0,212,255,0.2);
+      border-radius: 50%;
+      width: 48px; height: 48px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .author-bio .bio-text h4 { font-family: var(--font-heading); font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 0.3rem; }
+    .author-bio .bio-text p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.65; margin: 0; }
+
+    .article-copyright { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); line-height: 1.8; }
+    .back-link { display: inline-block; font-family: var(--font-mono); font-size: 0.78rem; color: var(--accent-cyan); text-decoration: none; letter-spacing: 0.08em; margin-bottom: 2rem; }
+    .back-link:hover { color: #fff; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-container">
+    <a href="../index.html" class="nav-brand">
+      <span class="brand-icon">◈</span>
+      <span>CORNELL <span class="brand-accent">SECURITY</span></span>
+    </a>
+    <div class="nav-links" id="navLinks">
+      <a href="../about.html">ABOUT</a>
+      <a href="../research.html">RESEARCH</a>
+      <a href="../blog.html" class="active">BLOG</a>
+      <a href="../contact.html">CONTACT</a>
+    </div>
+    <button class="nav-toggle" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
+  </div>
+</nav>
+
+<div class="page-wrapper">
+  <article class="article-wrapper">
+
+    <a href="../blog.html" class="back-link">← BACK TO BLOG</a>
+
+    <header class="article-header">
+      <span class="category-badge">Cyber Hygiene · NIST Fundamentals</span>
+      <h1>Cyber Hygiene 101</h1>
+      <p class="subtitle">What NIST Says About Keeping Your Digital Footprint Clean</p>
+      <div class="article-meta">
+        <span class="meta-author">Norris Cornell</span>
+        <span>·</span>
+        <span>Fundamentals</span>
+        <span>·</span>
+        <span>NIST SP 800-53</span>
+        <span>·</span>
+        <span>IAM / Hygiene</span>
+      </div>
+    </header>
+
+    <div class="article-body">
+
+      <div class="hook-block">
+        <p><strong>Cyber hygiene is your digital lifeline.</strong> It's the daily grind that keeps your footprint clean and attackers at bay: strong passwords, timely updates, and locked-down configurations. Skip it, and you're setting yourself up for an expensive lesson.</p>
+        <p>I've spent years working in SIEM monitoring, vulnerability management, and security hardening — triaging Splunk logs, locking down financial systems, and following NIST best practices. One thing is clear across all of it: <strong>cyber hygiene isn't optional — it's survival.</strong></p>
+      </div>
+
+      <h2>MGM's $100M Cyber Hygiene Lesson</h2>
+
+      <div class="stat-banner">
+        <span class="big-num">$100M+</span>
+        <span class="stat-label">MGM RESORTS BREACH · SEPTEMBER 2023</span>
+        <div class="stat-row">
+          <div class="stat-item">
+            <span class="si-val">10 days</span>
+            <span class="si-label">OUTAGE DURATION</span>
+          </div>
+          <div class="stat-item">
+            <span class="si-val">29</span>
+            <span class="si-label">PROPERTIES AFFECTED</span>
+          </div>
+          <div class="stat-item">
+            <span class="si-val">30M+</span>
+            <span class="si-label">RECORDS EXPOSED</span>
+          </div>
+          <div class="stat-item">
+            <span class="si-val">6+ TB</span>
+            <span class="si-label">DATA STOLEN</span>
+          </div>
+        </div>
+      </div>
+
+      <p>On September 8, 2023, ALPHV/BlackCat and Scattered Spider launched a ransomware attack across 29 MGM properties — Bellagio, MGM Grand, and more. ATMs crashed, slot machines failed, and digital room keys stopped working. The cause wasn't a sophisticated zero-day.</p>
+
+      <div class="case-study">
+        <span class="cs-label">ATTACK CHAIN · HOW THREE STEPS COST $100M</span>
+        <h4>How It Happened</h4>
+        <div class="cs-steps">
+          <div class="cs-step">
+            <span class="step-n">01</span>
+            <p><strong>Social Engineering — The Weakest Link.</strong> An attacker scraped an MGM employee's LinkedIn profile, called IT support, and social-engineered their way into an MFA reset. Ten minutes of conversation unlocked the door.</p>
+          </div>
+          <div class="cs-step">
+            <span class="step-n">02</span>
+            <p><strong>Poor Identity Verification.</strong> With the MFA reset in hand, the attacker gained admin access to Okta and Azure Active Directory — then exfiltrated over 6 terabytes of data including SSNs, passport numbers, and personal information for millions of customers.</p>
+          </div>
+          <div class="cs-step">
+            <span class="step-n">03</span>
+            <p><strong>Weak MFA and No Real-Time Monitoring.</strong> No advanced authentication verification. No anomaly detection that flagged a help desk reset being followed immediately by admin-level access to identity systems. A textbook cyber hygiene failure at every layer.</p>
+          </div>
+        </div>
+        <p style="font-size:0.88rem; color:var(--text-muted); margin:0;">MGM refused to pay the ransom. The damage was done anyway: $100M in lost revenue, ongoing litigation, and tens of millions of customer records exposed.</p>
+      </div>
+
+      <div class="callout callout-red">
+        <p>MGM didn't fall to a nation-state exploit or a zero-day vulnerability. They fell to a phone call, a LinkedIn search, and an IT help desk that skipped identity verification. Every item in this post would have stopped it.</p>
+      </div>
+
+      <!-- SECTION 1 -->
+      <div class="nist-section">
+        <div class="nist-header">
+          <span class="nist-num">01</span>
+          <span class="nist-title">MFA, Strong Passwords &amp; Password Managers</span>
+          <span class="nist-ref">NIST SP 800-53: IA-2, AC-7</span>
+        </div>
+        <div class="nist-body">
+          <p>MFA is the single highest-impact, lowest-cost control in the hygiene stack. If MGM had enforced strict MFA policies with identity verification requirements at the help desk — as NIST IA-2 mandates — this breach does not happen. One control. One hundred million dollars saved.</p>
+
+          <div class="audience-split">
+            <div class="audience-card business">
+              <span class="ac-label">// FOR BUSINESSES</span>
+              <div class="ac-body">
+                <p>Enforce company-wide MFA and train your help desk to verify every identity before any account change — especially MFA resets. That's where MGM failed. A 10-minute phone call should not unlock admin access to your identity platform.</p>
+              </div>
+            </div>
+            <div class="audience-card personal">
+              <span class="ac-label">// FOR INDIVIDUALS</span>
+              <div class="ac-body">
+                <p>Ditch weak passwords. Use passphrases (e.g., <code style="color:var(--accent-green); font-size:0.82rem;">Ph1llyC15A!</code>). Enable MFA on everything — email, banking, work accounts. No exceptions.</p>
+              </div>
+            </div>
+          </div>
+
+          <p>Use a password manager — <strong>Bitwarden</strong> or <strong>1Password</strong> are solid choices. NIST recommends password managers specifically to eliminate password reuse and reduce fatigue. One unique, complex password per account. The manager remembers them so you don't have to.</p>
+
+          <div class="reality-check">
+            <span class="rc-label">FIELD NOTE</span>
+            <p>I've seen one-time codes stop ransomware cold. Use them. MFA is not a suggestion for sophisticated users — it's table stakes for everyone.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 2 -->
+      <div class="nist-section">
+        <div class="nist-header">
+          <span class="nist-num">02</span>
+          <span class="nist-title">Patch &amp; Update Everything</span>
+          <span class="nist-ref">NIST SP 800-53: SI-2</span>
+        </div>
+        <div class="nist-body">
+          <p>Unpatched systems are not a technical problem — they're a policy failure. Every day a known vulnerability sits unpatched is a day an attacker can exploit it. MGM's 10-day operational outage strongly suggests poor patching discipline contributed to the blast radius of the breach.</p>
+
+          <div class="audience-split">
+            <div class="audience-card business">
+              <span class="ac-label">// FOR BUSINESSES</span>
+              <div class="ac-body">
+                <p>Schedule monthly patch cycles. Automate vulnerability scanning with tools like Nessus. Patch before attackers exploit the gap — not after the incident report is written.</p>
+              </div>
+            </div>
+            <div class="audience-card personal">
+              <span class="ac-label">// FOR INDIVIDUALS</span>
+              <div class="ac-body">
+                <p>When iOS or Windows says there's an update, run it. Those prompts aren't nagging — they're closing zero-days that researchers found and attackers are already testing.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="reality-check">
+            <span class="rc-label">FIELD NOTE</span>
+            <p>Unpatched endpoints are a straight path to breach. I've seen vulnerability scans flag critical CVEs on systems that hadn't been touched in 18 months — running software with public exploit code available.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 3 -->
+      <div class="nist-section">
+        <div class="nist-header">
+          <span class="nist-num">03</span>
+          <span class="nist-title">Secure Configurations &amp; Endpoint Protection</span>
+          <span class="nist-ref">NIST SP 800-53: CM-6, SC-7</span>
+        </div>
+        <div class="nist-body">
+          <p>MGM's admin access fell in ten minutes. That suggests default settings, overly permissive role-based access controls, or open ports that should have been closed. Misconfigurations are not edge cases — they are the most consistently exploited vulnerability class in enterprise environments.</p>
+
+          <div class="audience-split">
+            <div class="audience-card business">
+              <span class="ac-label">// FOR BUSINESSES</span>
+              <div class="ac-body">
+                <p>Scan configurations quarterly. Lock down admin privileges using least-privilege access. Close ports that aren't needed. Every open port is an attack surface — close what you don't use.</p>
+              </div>
+            </div>
+            <div class="audience-card personal">
+              <span class="ac-label">// FOR INDIVIDUALS</span>
+              <div class="ac-body">
+                <p>Secure your home Wi-Fi — use WPA3, change the default router password, and disable services you don't use. Your router is the perimeter of your home network. Treat it like one.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="reality-check">
+            <span class="rc-label">FIELD NOTE</span>
+            <p>I've run Nessus scans that surfaced open ports and misconfigurations that could have ended in a breach — on systems that hadn't been reviewed since initial deployment. Quarterly scans are not optional.</p>
+          </div>
+        </div>
+      </div>
+
+      <h2>Cyber Hygiene: It's Not Optional</h2>
+
+      <p>MGM is proof that basic cyber hygiene failures cost millions — and that the failures are almost always preventable. These controls are not advanced. They're not expensive. They're just consistently ignored until they aren't.</p>
+
+      <div class="checklist-grid">
+        <div class="checklist-card biz">
+          <span class="ck-header">// BUSINESSES</span>
+          <ul>
+            <li>Train your help desk — social engineering is the most common entry point</li>
+            <li>Roll out MFA company-wide — one weak account is all it takes</li>
+            <li>Patch on a schedule — monthly, no exceptions</li>
+            <li>Scan and lock down configurations — misconfigs are hacker gold</li>
+            <li>Audit RBAC — no one should have more access than they need</li>
+          </ul>
+        </div>
+        <div class="checklist-card personal">
+          <span class="ck-header">// INDIVIDUALS</span>
+          <ul>
+            <li>Stop using weak passwords — use passphrases and MFA everywhere</li>
+            <li>Use a password manager — unique passwords for every account</li>
+            <li>Update weekly — patches close holes attackers are actively exploiting</li>
+            <li>Lock your router — WPA3, changed defaults, unused services off</li>
+            <li>Audit your LinkedIn — oversharing helps attackers build your profile</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout callout-green">
+        <p>None of this is hard. All of it is skipped constantly. The gap between knowing and doing is where breaches happen.</p>
+      </div>
+
+      <!-- What's Next -->
+      <div class="next-block">
+        <span class="nb-label">// WHAT'S NEXT</span>
+        <p>I'm building cyber hygiene tools on GitHub (<a href="https://github.com/samson-2369" target="_blank" rel="noopener">samson-2369</a>) — password strength checkers, configuration scanners, and network defense utilities. These are public, documented, and designed to be useful to anyone building out a blue team skill set.</p>
+        <p>Future posts will continue unpacking NIST guidance and translating it into field-applicable security practice. The goal is always the same: make the right thing easier to do than the wrong thing.</p>
+      </div>
+
+    </div><!-- /.article-body -->
+
+    <!-- Author Bio -->
+    <div class="author-bio">
+      <div class="bio-initials">NC</div>
+      <div class="bio-text">
+        <h4>Norris Cornell</h4>
+        <p>Three-plus years in SIEM monitoring, vulnerability management, and security hardening across financial sector environments. IAM Technical Lead. Master's in SCADA Cybersecurity, Wilmington University. BSides Delaware organizer since 2015. Focused on translating NIST guidance into practical defense.</p>
+      </div>
+    </div>
+
+    <!-- Copyright -->
+    <div class="article-copyright">
+      <p>© 2024 Norris Cornell. All Rights Reserved.</p>
+      <p>This article is the intellectual property of Norris Cornell. Reproduction, redistribution, or use in any form without prior written permission is prohibited.</p>
+    </div>
+
+  </article>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">CORNELL <span>SECURITY</span></div>
+    <div class="footer-copy">© 2026 NORRIS CORNELL · ALL RIGHTS RESERVED</div>
+  </div>
+  <div class="footer-legal">
+    All content, research, frameworks, and written works published on this site are the intellectual property of Norris Cornell
+    and are protected by copyright. Reproduction, redistribution, or use in any form without prior written permission is prohibited.
+  </div>
+</footer>
+
+</body>
+</html>

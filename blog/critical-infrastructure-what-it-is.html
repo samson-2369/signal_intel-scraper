@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Critical Infrastructure: What It Is &amp; Why You Should Care — Cornell Security</title>
+  <meta name="description" content="A plain-language introduction to critical infrastructure — the 16 sectors that keep society running, how they touch your daily life, and what happens when they fail. Texas 2021, WannaCry, and why this matters to everyone.">
+  <meta name="author" content="Norris Cornell">
+  <meta name="copyright" content="© 2024 Norris Cornell. All Rights Reserved.">
+  <link rel="canonical" href="https://cornellsecurity.com/blog/critical-infrastructure-what-it-is.html">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .article-wrapper { max-width: 820px; margin: 0 auto; padding: 3rem 2rem 5rem; }
+    .article-header { margin-bottom: 3rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
+    .article-header h1 { font-family: var(--font-heading); font-size: clamp(1.7rem, 3.2vw, 2.4rem); font-weight: 700; color: #fff; line-height: 1.2; letter-spacing: 0.03em; margin-bottom: 1.25rem; }
+    .article-meta { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
+    .article-meta span { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); letter-spacing: 0.1em; }
+    .article-meta .meta-author { color: var(--accent-cyan); }
+    .category-badge { display: inline-block; font-family: var(--font-mono); font-size: 0.68rem; color: var(--accent-cyan); background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.2); padding: 0.3rem 0.75rem; border-radius: var(--radius); letter-spacing: 0.12em; margin-bottom: 1rem; }
+
+    .article-body h2 { font-family: var(--font-heading); font-size: 1.45rem; font-weight: 700; color: #fff; letter-spacing: 0.04em; margin: 2.75rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+    .article-body h3 { font-family: var(--font-heading); font-size: 1.05rem; font-weight: 600; color: var(--accent-cyan); letter-spacing: 0.06em; margin: 1.75rem 0 0.6rem; }
+    .article-body p { color: var(--text-secondary); font-size: 0.98rem; line-height: 1.85; margin-bottom: 1.15rem; }
+    .article-body strong { color: var(--text-primary); font-weight: 600; }
+
+    /* Opening hook */
+    .hook-block {
+      background: var(--bg-deep);
+      border: 1px solid var(--border-accent);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin-bottom: 2.5rem;
+      text-align: center;
+    }
+    .hook-block .hook-text {
+      font-family: var(--font-heading);
+      font-size: clamp(1.1rem, 2.6vw, 1.55rem);
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.4;
+      letter-spacing: 0.02em;
+      margin-bottom: 1rem;
+    }
+    .hook-block p { color: var(--text-muted); font-size: 0.92rem; line-height: 1.75; margin: 0; text-align: center; }
+
+    /* Callouts */
+    .callout { background: rgba(0,212,255,0.05); border-left: 3px solid var(--accent-cyan); padding: 1rem 1.25rem; margin: 1.75rem 0; border-radius: 0 var(--radius) var(--radius) 0; }
+    .callout p { margin: 0; color: var(--text-primary); font-size: 1rem; font-style: italic; line-height: 1.7; }
+    .callout-red { border-left-color: var(--accent-red); background: rgba(255,71,87,0.05); }
+    .callout-yellow { border-left-color: #f5a623; background: rgba(245,166,35,0.05); }
+
+    /* Day-in-life timeline */
+    .timeline { position: relative; margin: 2rem 0; }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 3.2rem;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: linear-gradient(to bottom, transparent, var(--border-accent) 10%, var(--border-accent) 90%, transparent);
+    }
+    .timeline-item {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 1.25rem;
+      position: relative;
+    }
+    .tl-time-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+      width: 6.4rem;
+    }
+    .tl-time {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--accent-cyan);
+      letter-spacing: 0.1em;
+      white-space: nowrap;
+      background: var(--bg-primary);
+      padding: 0 0.3rem;
+      z-index: 1;
+    }
+    .tl-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent-cyan);
+      border: 2px solid var(--bg-primary);
+      margin-top: 0.4rem;
+      flex-shrink: 0;
+      z-index: 1;
+    }
+    .tl-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.1rem 1.25rem;
+      flex: 1;
+      margin-bottom: 0;
+    }
+    .tl-card h4 {
+      font-family: var(--font-heading);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.35rem;
+    }
+    .tl-card p { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 0.5rem; }
+    .tl-card p:last-child { margin-bottom: 0; }
+    .tl-sectors { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.6rem; }
+    .tl-sector-tag {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--accent-cyan);
+      background: rgba(0,212,255,0.07);
+      border: 1px solid rgba(0,212,255,0.18);
+      border-radius: var(--radius);
+      padding: 0.15rem 0.5rem;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+    }
+    .tl-sector-tag:hover { background: rgba(0,212,255,0.14); color: #fff; }
+
+    /* Disruption case studies */
+    .disruption-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1.75rem 0;
+    }
+    @media (max-width: 560px) { .disruption-grid { grid-template-columns: 1fr; } }
+    .disruption-card {
+      background: var(--bg-card);
+      border: 1px solid rgba(255,71,87,0.25);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+    }
+    .disruption-card .dc-label {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      color: var(--accent-red);
+      letter-spacing: 0.12em;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    .disruption-card h4 {
+      font-family: var(--font-heading);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+    .disruption-card p { font-size: 0.87rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 0.5rem; }
+    .disruption-card p:last-child { margin-bottom: 0; }
+    .disruption-card .dc-impact {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--accent-red);
+      margin-top: 0.5rem;
+      display: block;
+    }
+
+    /* Closing question */
+    .closing-block {
+      background: var(--bg-deep);
+      border: 1px solid var(--border-accent);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin: 2.5rem 0;
+      text-align: center;
+    }
+    .closing-block .closing-q {
+      font-family: var(--font-heading);
+      font-size: clamp(1.1rem, 2.4vw, 1.45rem);
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.4;
+      margin-bottom: 1rem;
+    }
+    .closing-block p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.75; margin: 0; }
+
+    /* CISA reference banner */
+    .cisa-banner {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      margin: 1.75rem 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    .cisa-icon { color: var(--accent-cyan); font-size: 1.2rem; flex-shrink: 0; margin-top: 0.1rem; }
+    .cisa-banner .cb-label { font-family: var(--font-mono); font-size: 0.66rem; color: var(--text-muted); letter-spacing: 0.12em; display: block; margin-bottom: 0.3rem; }
+    .cisa-banner p { font-size: 0.87rem; color: var(--text-secondary); line-height: 1.65; margin: 0; }
+    .cisa-banner a { color: var(--accent-cyan); text-decoration: none; }
+    .cisa-banner a:hover { color: #fff; text-decoration: underline; }
+
+    /* Author bio */
+    .author-bio {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-top: 2.5rem;
+      display: flex;
+      gap: 1.25rem;
+      align-items: flex-start;
+    }
+    .author-bio .bio-initials {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      background: rgba(0,212,255,0.08);
+      border: 1px solid rgba(0,212,255,0.2);
+      border-radius: 50%;
+      width: 48px; height: 48px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .author-bio .bio-text h4 { font-family: var(--font-heading); font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 0.3rem; }
+    .author-bio .bio-text p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.65; margin: 0; }
+
+    .article-copyright { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); line-height: 1.8; }
+    .back-link { display: inline-block; font-family: var(--font-mono); font-size: 0.78rem; color: var(--accent-cyan); text-decoration: none; letter-spacing: 0.08em; margin-bottom: 2rem; }
+    .back-link:hover { color: #fff; }
+
+    @media (max-width: 520px) {
+      .timeline::before { left: 2.5rem; }
+      .tl-time-col { width: 5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-container">
+    <a href="../index.html" class="nav-brand">
+      <span class="brand-icon">◈</span>
+      <span>CORNELL <span class="brand-accent">SECURITY</span></span>
+    </a>
+    <div class="nav-links" id="navLinks">
+      <a href="../about.html">ABOUT</a>
+      <a href="../research.html">RESEARCH</a>
+      <a href="../blog.html" class="active">BLOG</a>
+      <a href="../contact.html">CONTACT</a>
+    </div>
+    <button class="nav-toggle" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
+  </div>
+</nav>
+
+<div class="page-wrapper">
+  <article class="article-wrapper">
+
+    <a href="../blog.html" class="back-link">← BACK TO BLOG</a>
+
+    <header class="article-header">
+      <span class="category-badge">Critical Infrastructure · Foundations</span>
+      <h1>Critical Infrastructure: What It Is &amp; Why You Should Care</h1>
+      <div class="article-meta">
+        <span class="meta-author">Norris Cornell</span>
+        <span>·</span>
+        <span>Foundational</span>
+        <span>·</span>
+        <span>Critical Infrastructure</span>
+        <span>·</span>
+        <span>Public Awareness</span>
+      </div>
+    </header>
+
+    <div class="article-body">
+
+      <div class="hook-block">
+        <div class="hook-text">Imagine waking up without electricity, running water, or a way to call for help.</div>
+        <p>That's the chaos we'd face without critical infrastructure — the essential systems, assets, and networks that keep society running. Energy, water, transportation, healthcare, telecommunications. They're so vital that their disruption can cripple national security, economic stability, public health, or safety. They're the backbone of daily life — and their protection matters far more than most people realize.</p>
+      </div>
+
+      <p>We rely on these systems every moment of every day — almost always without noticing. To understand what's actually at stake, let's walk through a typical day and see how many of them touch your life before you've even had lunch.</p>
+
+      <h2>How Critical Infrastructure Powers Your Day</h2>
+
+      <div class="timeline">
+
+        <div class="timeline-item">
+          <div class="tl-time-col">
+            <span class="tl-time">6:00 AM</span>
+            <div class="tl-dot"></div>
+          </div>
+          <div class="tl-card">
+            <h4>Morning Kickoff</h4>
+            <p>By the time you're sipping your first coffee, multiple sectors are already working on your behalf. The lights came on because the grid is running. The water pressure in your shower and the tap you brushed your teeth under exists because a treatment plant and pumping infrastructure operated overnight without incident.</p>
+            <div class="tl-sectors">
+              <a href="https://www.cisa.gov/topics/critical-infrastructure-security-and-resilience/critical-infrastructure-sectors/energy-sector" class="tl-sector-tag" target="_blank" rel="noopener">ENERGY SECTOR →</a>
+              <span class="tl-sector-tag" style="color:var(--text-muted); border-color:var(--border);">WATER SECTOR</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="tl-time-col">
+            <span class="tl-time">8:00 AM</span>
+            <div class="tl-dot"></div>
+          </div>
+          <div class="tl-card">
+            <h4>The Commute</h4>
+            <p>The roads, bridges, and traffic signals you navigate are maintained by the Transportation Sector. The GPS directions guiding you, the traffic update you heard on the radio, the quick call you made en route — all of it runs on Communications Sector infrastructure that most people assume is simply "the internet."</p>
+            <div class="tl-sectors">
+              <a href="https://www.cisa.gov/topics/critical-infrastructure-security-and-resilience/critical-infrastructure-sectors/transportation-systems-sector" class="tl-sector-tag" target="_blank" rel="noopener">TRANSPORTATION SECTOR →</a>
+              <span class="tl-sector-tag" style="color:var(--text-muted); border-color:var(--border);">COMMUNICATIONS</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="tl-time-col">
+            <span class="tl-time">9:00 AM</span>
+            <div class="tl-dot"></div>
+          </div>
+          <div class="tl-card">
+            <h4>At Work</h4>
+            <p>Checking email, pulling up documents, connecting to colleagues across the country — that's the Information Technology Sector. The building you're sitting in, whether office, retail space, or facility, falls under the Commercial Facilities Sector, which includes physical security, access control, and the HVAC keeping you comfortable.</p>
+            <div class="tl-sectors">
+              <a href="https://www.cisa.gov/topics/critical-infrastructure-security-and-resilience/critical-infrastructure-sectors/information-technology-sector" class="tl-sector-tag" target="_blank" rel="noopener">IT SECTOR →</a>
+              <span class="tl-sector-tag" style="color:var(--text-muted); border-color:var(--border);">COMMERCIAL FACILITIES</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="tl-time-col">
+            <span class="tl-time">12:00 PM</span>
+            <div class="tl-dot"></div>
+          </div>
+          <div class="tl-card">
+            <h4>Lunch Break</h4>
+            <p>The sandwich you grabbed exists because the Food and Agriculture Sector handled production, processing, and distribution — a supply chain spanning farms, processing facilities, cold storage, and delivery logistics. The tap to pay for it ran through the Financial Services Sector: banking systems, payment rails, and fraud detection all operating in the background of a two-second transaction.</p>
+            <div class="tl-sectors">
+              <a href="https://www.cisa.gov/topics/critical-infrastructure-security-and-resilience/critical-infrastructure-sectors/food-and-agriculture-sector" class="tl-sector-tag" target="_blank" rel="noopener">FOOD &amp; AGRICULTURE →</a>
+              <span class="tl-sector-tag" style="color:var(--text-muted); border-color:var(--border);">FINANCIAL SERVICES</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="tl-time-col">
+            <span class="tl-time">3:00 PM</span>
+            <div class="tl-dot"></div>
+          </div>
+          <div class="tl-card">
+            <h4>Health Check</h4>
+            <p>A visit to a doctor or pharmacy touches the Healthcare and Public Health Sector — hospitals, clinics, pharmacies, and the supply chains that keep medications available. Behind every emergency call, fire truck, and ambulance crew is the Emergency Services Sector, standing by so that when things go wrong, there's someone to call.</p>
+            <div class="tl-sectors">
+              <a href="https://www.cisa.gov/topics/critical-infrastructure-security-and-resilience/critical-infrastructure-sectors/emergency-services-sector" class="tl-sector-tag" target="_blank" rel="noopener">EMERGENCY SERVICES →</a>
+              <span class="tl-sector-tag" style="color:var(--text-muted); border-color:var(--border);">HEALTHCARE</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="tl-time-col">
+            <span class="tl-time">9:00 PM</span>
+            <div class="tl-dot"></div>
+          </div>
+          <div class="tl-card">
+            <h4>Evening Wind-Down</h4>
+            <p>Streaming a movie, scrolling your phone, adjusting the thermostat — the Communications Sector is still running your connectivity, and the Energy Sector is still powering your TV, HVAC, and lights. From the moment you woke up to the moment you go to sleep, critical infrastructure was running continuously in every corner of your day.</p>
+            <div class="tl-sectors">
+              <a href="https://www.cisa.gov/topics/critical-infrastructure-security-and-resilience/critical-infrastructure-sectors/communications-sector" class="tl-sector-tag" target="_blank" rel="noopener">COMMUNICATIONS SECTOR →</a>
+              <span class="tl-sector-tag" style="color:var(--text-muted); border-color:var(--border);">ENERGY SECTOR</span>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /.timeline -->
+
+      <div class="cisa-banner">
+        <span class="cisa-icon">◈</span>
+        <div>
+          <span class="cb-label">REFERENCE · CISA.GOV</span>
+          <p>CISA (the Cybersecurity and Infrastructure Security Agency) oversees the security of all 16 critical infrastructure sectors. For official sector definitions, threat guidance, and resilience resources: <a href="https://www.cisa.gov/topics/critical-infrastructure-security-and-resilience" target="_blank" rel="noopener">cisa.gov/critical-infrastructure</a></p>
+        </div>
+      </div>
+
+      <h2>Why Critical Infrastructure Security Matters</h2>
+
+      <p>These sectors hum in the background, enabling the routines we take for granted. But what happens when they fail? Disruptions aren't just inconvenient — they're dangerous, threatening lives, livelihoods, and entire communities. Two examples make this concrete.</p>
+
+      <div class="disruption-grid">
+        <div class="disruption-card">
+          <span class="dc-label">CASE · FEBRUARY 2021</span>
+          <h4>Texas Power Crisis</h4>
+          <p>A severe winter storm caused cascading failures across the Texas power grid, leaving millions of residents without electricity — in freezing temperatures — for days. Water pipes froze and burst. Hospitals struggled. Over 240 people died.</p>
+          <p>The crisis wasn't caused by a cyberattack. It was caused by infrastructure that wasn't hardened for conditions that, in hindsight, were predictable. The lesson is the same: dependency on critical systems without investment in their resilience is a risk that eventually materializes.</p>
+          <span class="dc-impact">~4.5 million households lost power · 246+ deaths · $195B in damages</span>
+        </div>
+        <div class="disruption-card">
+          <span class="dc-label">CASE · MAY 2017</span>
+          <h4>WannaCry Ransomware</h4>
+          <p>The WannaCry ransomware attack infected over 200,000 systems across 150 countries in a single day. Among the hardest hit: the UK's National Health Service, which was forced to cancel thousands of appointments and turn away non-critical patients when hospital computers locked up mid-operation.</p>
+          <p>The attack exploited an unpatched Windows vulnerability — the same basic patch management failure discussed in every cyber hygiene guide ever written. Basic hygiene failures in critical systems have consequences that extend far beyond the IT department.</p>
+          <span class="dc-impact">200,000+ systems affected · 150 countries · NHS forced to divert emergency care</span>
+        </div>
+      </div>
+
+      <div class="callout callout-red">
+        <p>These aren't distant scenarios. They happened recently, in modern developed countries with significant resources — and they were largely preventable.</p>
+      </div>
+
+      <h2>Are We Prepared for a Crisis?</h2>
+
+      <p>Critical infrastructure isn't glamorous. It doesn't generate headlines until something goes wrong — and by then, the cost is already being paid by real people. The power that didn't come on. The call that didn't go through. The medication that wasn't available.</p>
+
+      <p>Understanding what critical infrastructure is and how it works is the first step toward having an informed perspective on how it should be protected. Security professionals, policy makers, engineers, and ordinary citizens all have a role — even if that role is simply understanding what's at stake when we make decisions about investment, maintenance, and risk tolerance.</p>
+
+      <div class="closing-block">
+        <div class="closing-q">Next time your day runs smoothly, give it a quiet nod — and ask yourself: how prepared are we if one of these lifelines goes down?</div>
+        <p>That question is where this field starts. Every post on this site is an attempt to help answer it.</p>
+      </div>
+
+    </div><!-- /.article-body -->
+
+    <!-- Author Bio -->
+    <div class="author-bio">
+      <div class="bio-initials">NC</div>
+      <div class="bio-text">
+        <h4>Norris Cornell</h4>
+        <p>Nearly 20 years as an electronics technician, now working at the intersection of cyber-physical systems and critical infrastructure defense. Master's in SCADA Cybersecurity, Wilmington University. IAM Technical Lead in the financial sector. BSides Delaware organizer since 2015.</p>
+      </div>
+    </div>
+
+    <!-- Copyright -->
+    <div class="article-copyright">
+      <p>© 2024 Norris Cornell. All Rights Reserved.</p>
+      <p>This article is the intellectual property of Norris Cornell. Reproduction, redistribution, or use in any form without prior written permission is prohibited.</p>
+    </div>
+
+  </article>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">CORNELL <span>SECURITY</span></div>
+    <div class="footer-copy">© 2026 NORRIS CORNELL · ALL RIGHTS RESERVED</div>
+  </div>
+  <div class="footer-legal">
+    All content, research, frameworks, and written works published on this site are the intellectual property of Norris Cornell
+    and are protected by copyright. Reproduction, redistribution, or use in any form without prior written permission is prohibited.
+  </div>
+</footer>
+
+</body>
+</html>

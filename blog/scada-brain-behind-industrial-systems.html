@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SCADA: The Brain Behind Industrial Systems — Cornell Security</title>
+  <meta name="description" content="A foundational guide to SCADA systems for cybersecurity professionals. The brain-body analogy, all 16 critical infrastructure sectors, Stuxnet, and why increased connectivity means increased risk.">
+  <meta name="author" content="Norris Cornell">
+  <meta name="copyright" content="© 2025 Norris Cornell. All Rights Reserved.">
+  <link rel="canonical" href="https://cornellsecurity.com/blog/scada-brain-behind-industrial-systems.html">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .article-wrapper { max-width: 800px; margin: 0 auto; padding: 3rem 2rem 5rem; }
+    .article-header { margin-bottom: 3rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
+    .article-header h1 { font-family: var(--font-heading); font-size: clamp(1.7rem, 3.2vw, 2.4rem); font-weight: 700; color: #fff; line-height: 1.2; letter-spacing: 0.03em; margin-bottom: 1.25rem; }
+    .article-meta { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; margin-bottom: 0.75rem; }
+    .article-meta span { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); letter-spacing: 0.1em; }
+    .article-meta .meta-author { color: var(--accent-cyan); }
+    .category-badge { display: inline-block; font-family: var(--font-mono); font-size: 0.68rem; color: var(--accent-cyan); background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.2); padding: 0.3rem 0.75rem; border-radius: var(--radius); letter-spacing: 0.12em; margin-bottom: 1rem; }
+
+    .article-body h2 { font-family: var(--font-heading); font-size: 1.45rem; font-weight: 700; color: #fff; letter-spacing: 0.04em; margin: 2.75rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+    .article-body h3 { font-family: var(--font-heading); font-size: 1.05rem; font-weight: 600; color: var(--accent-cyan); letter-spacing: 0.06em; margin: 1.75rem 0 0.6rem; }
+    .article-body p { color: var(--text-secondary); font-size: 0.98rem; line-height: 1.85; margin-bottom: 1.15rem; }
+    .article-body strong { color: var(--text-primary); font-weight: 600; }
+
+    /* Intro hook */
+    .intro-hook {
+      background: var(--bg-deep);
+      border: 1px solid var(--border-accent);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin-bottom: 2.5rem;
+    }
+    .intro-hook p { color: var(--text-secondary); font-size: 0.97rem; line-height: 1.85; margin-bottom: 0.75rem; }
+    .intro-hook p:last-child { margin-bottom: 0; }
+    .intro-hook strong { color: var(--accent-cyan); }
+
+    /* Callouts */
+    .callout { background: rgba(0,212,255,0.05); border-left: 3px solid var(--accent-cyan); padding: 1rem 1.25rem; margin: 1.75rem 0; border-radius: 0 var(--radius) var(--radius) 0; }
+    .callout p { margin: 0; color: var(--text-primary); font-size: 1.02rem; font-style: italic; line-height: 1.7; }
+    .callout-red { border-left-color: var(--accent-red); background: rgba(255,71,87,0.05); }
+    .callout-green { border-left-color: var(--accent-green); background: rgba(0,255,159,0.05); }
+
+    /* Analogy table */
+    .analogy-section { margin: 2rem 0; }
+    .analogy-header {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      background: var(--bg-deep);
+      border: 1px solid var(--border-accent);
+      border-radius: var(--radius) var(--radius) 0 0;
+      overflow: hidden;
+    }
+    .analogy-header .ah-col {
+      padding: 0.75rem 1.25rem;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      text-align: center;
+    }
+    .analogy-header .ah-col.body-col { color: var(--accent-green); border-right: 1px solid var(--border); }
+    .analogy-header .ah-col.scada-col { color: var(--accent-cyan); }
+    .analogy-rows { border: 1px solid var(--border); border-top: none; border-radius: 0 0 var(--radius) var(--radius); overflow: hidden; }
+    .analogy-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-bottom: 1px solid var(--border);
+    }
+    .analogy-row:last-child { border-bottom: none; }
+    .analogy-row:hover { background: rgba(255,255,255,0.02); }
+    .ar-body {
+      padding: 1rem 1.25rem;
+      border-right: 1px solid var(--border);
+      background: rgba(0,255,159,0.02);
+    }
+    .ar-scada { padding: 1rem 1.25rem; }
+    .ar-body .ar-label { font-family: var(--font-mono); font-size: 0.66rem; color: var(--accent-green); letter-spacing: 0.12em; display: block; margin-bottom: 0.3rem; }
+    .ar-scada .ar-label { font-family: var(--font-mono); font-size: 0.66rem; color: var(--accent-cyan); letter-spacing: 0.12em; display: block; margin-bottom: 0.3rem; }
+    .ar-body h4, .ar-scada h4 { font-family: var(--font-heading); font-size: 0.92rem; font-weight: 700; color: #fff; margin-bottom: 0.35rem; }
+    .ar-body p, .ar-scada p { font-size: 0.84rem; color: var(--text-muted); line-height: 1.6; margin: 0; }
+
+    /* Sectors grid */
+    .sectors-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 0.5rem;
+      margin: 1.5rem 0;
+    }
+    .sector-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.6rem 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .sector-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-cyan); flex-shrink: 0; }
+    .sector-item span { font-size: 0.84rem; color: var(--text-secondary); line-height: 1.4; }
+
+    /* Case study — Stuxnet */
+    .case-study {
+      background: var(--bg-card);
+      border: 1px solid rgba(255,71,87,0.3);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin: 1.75rem 0;
+    }
+    .case-study .cs-label { font-family: var(--font-mono); font-size: 0.66rem; color: var(--accent-red); letter-spacing: 0.14em; display: block; margin-bottom: 0.6rem; }
+    .case-study h4 { font-family: var(--font-heading); font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 0.75rem; }
+    .case-study p { font-size: 0.92rem; color: var(--text-secondary); line-height: 1.75; margin-bottom: 0.75rem; }
+    .case-study p:last-child { margin-bottom: 0; }
+
+    /* Security risk block */
+    .risk-block {
+      background: rgba(255,71,87,0.05);
+      border: 1px solid rgba(255,71,87,0.2);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin: 1.75rem 0;
+    }
+    .risk-block .rb-label { font-family: var(--font-mono); font-size: 0.66rem; color: var(--accent-red); letter-spacing: 0.14em; display: block; margin-bottom: 0.75rem; }
+    .risk-block p { font-size: 0.93rem; color: var(--text-secondary); line-height: 1.8; margin-bottom: 0.75rem; }
+    .risk-block p:last-child { margin-bottom: 0; }
+    .risk-block strong { color: var(--accent-red); }
+
+    /* Future evolution */
+    .future-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0.75rem;
+      margin: 1.5rem 0;
+    }
+    @media (max-width: 560px) { .future-grid { grid-template-columns: 1fr; } }
+    .future-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.1rem;
+      text-align: center;
+    }
+    .future-card .fc-icon { font-size: 1.5rem; margin-bottom: 0.5rem; display: block; }
+    .future-card h4 { font-family: var(--font-heading); font-size: 0.88rem; font-weight: 700; color: #fff; margin-bottom: 0.4rem; }
+    .future-card p { font-size: 0.82rem; color: var(--text-muted); line-height: 1.55; margin: 0; }
+    .future-card .fc-risk { font-family: var(--font-mono); font-size: 0.68rem; color: var(--accent-red); margin-top: 0.5rem; display: block; }
+
+    /* Takeaways */
+    .takeaways {
+      background: var(--bg-deep);
+      border: 1px solid var(--border-accent);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+      margin: 2.5rem 0;
+    }
+    .takeaways .tk-label { font-family: var(--font-mono); font-size: 0.68rem; color: var(--accent-cyan); letter-spacing: 0.14em; display: block; margin-bottom: 1rem; }
+    .takeaways ul { list-style: none; padding: 0; margin: 0; }
+    .takeaways ul li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.55rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.93rem;
+      color: var(--text-secondary);
+      line-height: 1.65;
+    }
+    .takeaways ul li:last-child { border-bottom: none; }
+    .takeaways ul li::before { content: "◈"; color: var(--accent-cyan); flex-shrink: 0; font-size: 0.7rem; margin-top: 0.25rem; }
+
+    /* Connect block */
+    .connect-block {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin: 2rem 0;
+    }
+    .connect-block h3 { font-family: var(--font-heading); font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem; }
+    .connect-block p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 0.5rem; }
+    .connect-block p:last-child { margin-bottom: 0; }
+    .connect-block a { color: var(--accent-cyan); text-decoration: none; }
+    .connect-block a:hover { color: #fff; text-decoration: underline; }
+
+    /* Author bio */
+    .author-bio {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-top: 2.5rem;
+      display: flex;
+      gap: 1.25rem;
+      align-items: flex-start;
+    }
+    .author-bio .bio-initials {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      background: rgba(0,212,255,0.08);
+      border: 1px solid rgba(0,212,255,0.2);
+      border-radius: 50%;
+      width: 48px; height: 48px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .author-bio .bio-text h4 { font-family: var(--font-heading); font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 0.3rem; }
+    .author-bio .bio-text p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.65; margin: 0; }
+
+    .article-copyright { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); line-height: 1.8; }
+    .back-link { display: inline-block; font-family: var(--font-mono); font-size: 0.78rem; color: var(--accent-cyan); text-decoration: none; letter-spacing: 0.08em; margin-bottom: 2rem; }
+    .back-link:hover { color: #fff; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-container">
+    <a href="../index.html" class="nav-brand">
+      <span class="brand-icon">◈</span>
+      <span>CORNELL <span class="brand-accent">SECURITY</span></span>
+    </a>
+    <div class="nav-links" id="navLinks">
+      <a href="../about.html">ABOUT</a>
+      <a href="../research.html">RESEARCH</a>
+      <a href="../blog.html" class="active">BLOG</a>
+      <a href="../contact.html">CONTACT</a>
+    </div>
+    <button class="nav-toggle" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
+  </div>
+</nav>
+
+<div class="page-wrapper">
+  <article class="article-wrapper">
+
+    <a href="../blog.html" class="back-link">← BACK TO BLOG</a>
+
+    <header class="article-header">
+      <span class="category-badge">ICS/OT Fundamentals</span>
+      <h1>SCADA: The Brain Behind Industrial Systems</h1>
+      <div class="article-meta">
+        <span class="meta-author">Norris Cornell</span>
+        <span>·</span>
+        <span>March 26, 2025</span>
+        <span>·</span>
+        <span>SCADA / ICS</span>
+        <span>·</span>
+        <span>Critical Infrastructure</span>
+      </div>
+    </header>
+
+    <div class="article-body">
+
+      <div class="intro-hook">
+        <p>Imagine the human body performing a simple task — picking up a glass of water. Your eyes see the glass, your brain decides to grab it, your nerves send signals to your muscles, and your hand moves without hesitation. This happens in milliseconds.</p>
+        <p>Now, scale that level of coordination to an entire water treatment plant, power grid, or factory. That's the role of <strong>SCADA — Supervisory Control and Data Acquisition</strong>. It's the digital brain of industrial operations, connecting machines, sensors, and control systems so processes run smoothly and safely.</p>
+      </div>
+
+      <h2>The Brain-Body Analogy: SCADA Simplified</h2>
+
+      <p>Understanding SCADA can be challenging for newcomers. The best way to make it concrete: think of SCADA as the central nervous system of an industrial environment. Each component maps directly to something the human body already does.</p>
+
+      <div class="analogy-section">
+        <div class="analogy-header">
+          <div class="ah-col body-col">HUMAN BODY</div>
+          <div class="ah-col scada-col">SCADA EQUIVALENT</div>
+        </div>
+        <div class="analogy-rows">
+
+          <div class="analogy-row">
+            <div class="ar-body">
+              <span class="ar-label">BODY · COMPONENT</span>
+              <h4>Conscious Brain &amp; Eyes</h4>
+              <p>Sees the environment, makes decisions, provides the operator with awareness and control</p>
+            </div>
+            <div class="ar-scada">
+              <span class="ar-label">SCADA · COMPONENT</span>
+              <h4>Human-Machine Interface (HMI)</h4>
+              <p>The central point where cyber and physical worlds converge — provides visibility, understanding, and direct interaction with the SCADA environment</p>
+            </div>
+          </div>
+
+          <div class="analogy-row">
+            <div class="ar-body">
+              <span class="ar-label">BODY · COMPONENT</span>
+              <h4>Reflexes &amp; Spinal Cord</h4>
+              <p>Handles immediate responses and localized decisions without waiting for the brain — automatic, fast, protective</p>
+            </div>
+            <div class="ar-scada">
+              <span class="ar-label">SCADA · COMPONENT</span>
+              <h4>PLCs / RTUs</h4>
+              <p>Programmable Logic Controllers and Remote Terminal Units — handle immediate responses, automatic actions, and localized decision-making without always requiring central input</p>
+            </div>
+          </div>
+
+          <div class="analogy-row">
+            <div class="ar-body">
+              <span class="ar-label">BODY · COMPONENT</span>
+              <h4>Sensory Organs</h4>
+              <p>Eyes, ears, skin — gather vital information about the environment and report it upward</p>
+            </div>
+            <div class="ar-scada">
+              <span class="ar-label">SCADA · COMPONENT</span>
+              <h4>Sensors</h4>
+              <p>Gather vital information about physical conditions — temperature, pressure, flow rate, position — and feed that data into the control loop</p>
+            </div>
+          </div>
+
+          <div class="analogy-row">
+            <div class="ar-body">
+              <span class="ar-label">BODY · COMPONENT</span>
+              <h4>Muscles</h4>
+              <p>Execute commands — physically interact with the world based on instructions received from the brain and spinal cord</p>
+            </div>
+            <div class="ar-scada">
+              <span class="ar-label">SCADA · COMPONENT</span>
+              <h4>Actuators</h4>
+              <p>Execute commands from the system — physically interact with equipment and machinery (opening valves, starting motors, tripping breakers) based on instructions received</p>
+            </div>
+          </div>
+
+          <div class="analogy-row">
+            <div class="ar-body">
+              <span class="ar-label">BODY · COMPONENT</span>
+              <h4>Nervous System</h4>
+              <p>Enables rapid, coordinated communication among all parts — ensuring synchronized, cohesive operation</p>
+            </div>
+            <div class="ar-scada">
+              <span class="ar-label">SCADA · COMPONENT</span>
+              <h4>Communication Network</h4>
+              <p>Enables rapid and coordinated communication among all parts of the SCADA system — whether over wired Ethernet, serial links, or RF/satellite connections</p>
+            </div>
+          </div>
+
+          <div class="analogy-row">
+            <div class="ar-body">
+              <span class="ar-label">BODY · COMPONENT</span>
+              <h4>Memory</h4>
+              <p>Stores experience — provides context, reference, and the basis for learning and improved future decisions</p>
+            </div>
+            <div class="ar-scada">
+              <span class="ar-label">SCADA · COMPONENT</span>
+              <h4>Historian &amp; Data Logger</h4>
+              <p>Stores historical process data — provides context, reference, and insights for analysis, trend detection, and improved decision-making</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="callout">
+        <p>Without SCADA, operators would be "flying blind." Real-time decisions, efficiency gains, and safety protocols would be impossible to maintain at scale across any modern industrial operation.</p>
+      </div>
+
+      <h2>Why SCADA Is Critical Infrastructure</h2>
+
+      <p>SCADA systems are embedded in all 16 sectors of U.S. critical infrastructure — which means a significant SCADA vulnerability or attack isn't an industrial problem, it's a national security problem.</p>
+
+      <div class="sectors-grid">
+        <div class="sector-item"><span class="sector-dot"></span><span>Chemical</span></div>
+        <div class="sector-item"><span class="sector-dot"></span><span>Commercial Facilities</span></div>
+        <div class="sector-item"><span class="sector-dot"></span><span>Communications</span></div>
+        <div class="sector-item"><span class="sector-dot"></span><span>Critical Manufacturing</span></div>
+        <div class="sector-item"><span class="sector-dot"></span><span>Dams</span></div>
+        <div class="sector-item"><span class="sector-dot"></span><span>Defense Industrial Base</span></div>
+        <div class="sector-item"><span class="sector-dot"></span><span>Emergency Services</span></div>
+        <div class="sector-item"><span class="sector-dot"></span><span>Energy (Power Grid)</span></div>
+        <div class="sector-item"><span class="sector-dot"></span><span>Financial Services</span></div>
+        <div class="sector-item"><span class="sector-dot"></span><span>Food and Agriculture</span></div>
+        <div class="sector-item"><span class="sector-dot"></span><span>Government Facilities</span></div>
+        <div class="sector-item"><span class="sector-dot"></span><span>Healthcare &amp; Public Health</span></div>
+        <div class="sector-item"><span class="sector-dot"></span><span>Information Technology</span></div>
+        <div class="sector-item"><span class="sector-dot"></span><span>Nuclear Reactors &amp; Waste</span></div>
+        <div class="sector-item"><span class="sector-dot"></span><span>Transportation &amp; Logistics</span></div>
+        <div class="sector-item"><span class="sector-dot"></span><span>Water &amp; Wastewater</span></div>
+      </div>
+
+      <h2>The Cybersecurity Perspective</h2>
+
+      <p>SCADA systems were traditionally isolated — physically separated from corporate IT networks and the public internet. That's no longer the reality. Modern SCADA infrastructure increasingly includes remote access portals, IoT-connected field devices, and cloud-based monitoring dashboards. Each of these represents a new pathway into systems that were never designed for exposure.</p>
+
+      <div class="risk-block">
+        <span class="rb-label">THREAT MODEL</span>
+        <p>An attacker who compromises a SCADA system isn't just reading data or exfiltrating records. They're in a position to cause <strong>real-world physical damage</strong> — from disrupting power delivery to corrupting water treatment chemistry to forcing industrial equipment into unsafe states.</p>
+        <p>Think of it this way: if an attacker controls the SCADA system, it's like someone hijacking your brain and controlling your body. The commands look legitimate. The system executes them faithfully. And the consequences are physical.</p>
+      </div>
+
+      <div class="case-study">
+        <span class="cs-label">CASE STUDY · 2010 — STUXNET</span>
+        <h4>When a Cyber Weapon Destroyed Physical Infrastructure</h4>
+        <p>Stuxnet, a sophisticated cyber weapon discovered in 2010 and widely attributed to a joint U.S.-Israeli operation, targeted SCADA systems controlling uranium enrichment centrifuges at the Natanz facility in Iran. It was the first publicly known instance of malware causing physical destruction of industrial equipment.</p>
+        <p>What made Stuxnet remarkable — and alarming — was its precision and patience. It operated silently within the SCADA environment, manipulating centrifuge rotor speeds while simultaneously feeding false sensor data to the HMI so operators saw normal readings. The centrifuges destroyed themselves while every alarm showed green.</p>
+        <p>Stuxnet demonstrated conclusively that SCADA systems are not just IT targets — they are physical weapons delivery mechanisms when placed in the wrong hands.</p>
+      </div>
+
+      <h2>The Future of SCADA: Smarter but Riskier</h2>
+
+      <p>SCADA technology is evolving rapidly, driven by efficiency demands and the broader convergence of IT and OT. The capabilities being added are genuinely valuable — and genuinely dangerous.</p>
+
+      <div class="future-grid">
+        <div class="future-card">
+          <span class="fc-icon">◈</span>
+          <h4>AI-Driven Analytics</h4>
+          <p>Machine learning applied to process data for real-time optimization and predictive insights</p>
+          <span class="fc-risk">⚠ New model attack surfaces</span>
+        </div>
+        <div class="future-card">
+          <span class="fc-icon">◈</span>
+          <h4>Predictive Maintenance</h4>
+          <p>Sensor data analyzed to anticipate equipment failures before they cause downtime</p>
+          <span class="fc-risk">⚠ Expanded sensor exposure</span>
+        </div>
+        <div class="future-card">
+          <span class="fc-icon">◈</span>
+          <h4>Cloud &amp; Remote Access</h4>
+          <p>SCADA dashboards accessible remotely via web interfaces and mobile platforms</p>
+          <span class="fc-risk">⚠ Internet-facing attack surface</span>
+        </div>
+      </div>
+
+      <p>Each of these upgrades improves operational efficiency. Each also introduces new exposure. That's why cyber hygiene, network auditing, and proactive security are more important now than at any point in SCADA's history — and why the security community needs practitioners who understand both domains.</p>
+
+      <!-- Takeaways -->
+      <div class="takeaways">
+        <span class="tk-label">// TAKEAWAYS</span>
+        <ul>
+          <li>SCADA is the "brain" of industrial systems — it connects sensors, controllers, actuators, and operators into a coordinated control loop</li>
+          <li>It automates and monitors critical processes across all 16 sectors of U.S. critical infrastructure</li>
+          <li>SCADA cyber attacks can have physical consequences — Stuxnet proved this at scale in 2010</li>
+          <li>The more connected SCADA becomes, the more the security model matters — and the more defenders who understand both IT and OT are needed</li>
+        </ul>
+      </div>
+
+      <!-- Connect -->
+      <div class="connect-block">
+        <h3>Join the Conversation</h3>
+        <p>Have thoughts or questions about SCADA or OT security? I'd love to hear from you.</p>
+        <p>
+          Email: <a href="mailto:norris@cornellsecurity.com">norris@cornellsecurity.com</a><br>
+          LinkedIn: <a href="https://www.linkedin.com/in/norriscornell/" target="_blank" rel="noopener">linkedin.com/in/norriscornell</a>
+        </p>
+      </div>
+
+    </div><!-- /.article-body -->
+
+    <!-- Author Bio -->
+    <div class="author-bio">
+      <div class="bio-initials">NC</div>
+      <div class="bio-text">
+        <h4>Norris Cornell</h4>
+        <p>Nearly 20 years as an electronics technician, now working at the intersection of cyber-physical systems and critical infrastructure defense. Master's in SCADA Cybersecurity, Wilmington University. IAM Technical Lead in the financial sector. BSides Delaware organizer since 2015. DoD Secret clearance holder.</p>
+      </div>
+    </div>
+
+    <!-- Copyright -->
+    <div class="article-copyright">
+      <p>© 2025 Norris Cornell. All Rights Reserved.</p>
+      <p>This article is the intellectual property of Norris Cornell. Reproduction, redistribution, or use in any form without prior written permission is prohibited.</p>
+    </div>
+
+  </article>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">CORNELL <span>SECURITY</span></div>
+    <div class="footer-copy">© 2026 NORRIS CORNELL · ALL RIGHTS RESERVED</div>
+  </div>
+  <div class="footer-legal">
+    All content, research, frameworks, and written works published on this site are the intellectual property of Norris Cornell
+    and are protected by copyright. Reproduction, redistribution, or use in any form without prior written permission is prohibited.
+  </div>
+</footer>
+
+</body>
+</html>
