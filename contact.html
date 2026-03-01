@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact — Cornell Security</title>
+  <meta name="description" content="Contact Norris Cornell for speaking engagements, research collaboration, consulting, or press inquiries.">
+  <meta name="author" content="Norris Cornell">
+  <meta name="copyright" content="© 2026 Norris Cornell. All Rights Reserved.">
+  <link rel="canonical" href="https://cornellsecurity.com/contact.html">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .contact-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+    }
+    .contact-card h3 {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.04em;
+    }
+    .contact-card p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+    .contact-card .icon {
+      font-size: 1.4rem;
+      margin-bottom: 0.75rem;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-container">
+    <a href="index.html" class="nav-brand">
+      <span class="brand-icon">◈</span>
+      <span>CORNELL <span class="brand-accent">SECURITY</span></span>
+    </a>
+    <div class="nav-links" id="navLinks">
+      <a href="about.html">ABOUT</a>
+      <a href="research.html">RESEARCH</a>
+      <a href="blog.html">BLOG</a>
+      <a href="contact.html" class="active">CONTACT</a>
+    </div>
+    <button class="nav-toggle" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
+  </div>
+</nav>
+
+<div class="page-wrapper">
+
+  <div class="page-header">
+    <div class="page-header-content">
+      <span class="section-label">// CONTACT</span>
+      <h1>Get In Touch</h1>
+      <p>Speaking engagements, research collaboration, consulting, and press inquiries.</p>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="container">
+      <div class="contact-grid">
+
+        <!-- Left: Info -->
+        <div>
+          <div class="contact-info">
+            <h3>Reach Out</h3>
+            <p>
+              Available for speaking engagements at security conferences, research collaboration,
+              technical consulting on ICS/OT security, and media inquiries related to critical
+              infrastructure and physical-layer security.
+            </p>
+
+            <!-- Replace the placeholder below with your actual email -->
+            <div class="contact-item">
+              <span>EMAIL</span>
+              <span><!-- ADD YOUR EMAIL HERE --><em style="color:var(--text-muted)">contact@cornellsecurity.com</em></span>
+            </div>
+            <div class="contact-item">
+              <span>LOCATION</span>
+              <span>Delaware, USA</span>
+            </div>
+            <div class="contact-item">
+              <span>EVENTS</span>
+              <span>BSides Delaware · ICS Cyber Security Conference · S4</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Cards -->
+        <div class="grid-2" style="gap:1rem;">
+
+          <div class="contact-card">
+            <div class="icon">◈</div>
+            <h3>Speaking</h3>
+            <p>Research presentations on ICS/OT security, physical-layer attacks, GNSS vulnerabilities, and critical infrastructure defense.</p>
+          </div>
+
+          <div class="contact-card">
+            <div class="icon">◈</div>
+            <h3>Collaboration</h3>
+            <p>Open to joint research on cyber-physical systems, ICS signal integrity, and infrastructure resilience. Academic and industry inquiries welcome.</p>
+          </div>
+
+          <div class="contact-card">
+            <div class="icon">◈</div>
+            <h3>Consulting</h3>
+            <p>Technical advisory on ICS/OT security architecture, physical-layer risk assessment, and critical infrastructure threat modeling.</p>
+          </div>
+
+          <div class="contact-card">
+            <div class="icon">◈</div>
+            <h3>Press &amp; Media</h3>
+            <p>Available for expert commentary on ICS/OT security, critical infrastructure threats, GNSS vulnerabilities, and cyber-physical risk.</p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">CORNELL <span>SECURITY</span></div>
+    <div class="footer-copy">© 2026 NORRIS CORNELL · ALL RIGHTS RESERVED</div>
+  </div>
+  <div class="footer-legal">
+    All content, research, frameworks, and written works published on this site are the intellectual property of Norris Cornell
+    and are protected by copyright. Reproduction, redistribution, or use in any form without prior written permission is prohibited.
+  </div>
+</footer>
+
+</body>
+</html>

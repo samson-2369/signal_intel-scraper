@@ -1,69 +1,214 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name='viewport' content='width=device-width, initial-scale=1.0'>
-    <title>CORNELL SECURITY | PORTFOLIO & INTEL</title><style>
-    :root { --bg: #0d1117; --card: #161b22; --border: #30363d; --text: #c9d1d9; --accent: #58a6ff; --green: #3fb950; }
-    body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; line-height: 1.6; }
-    .nav { display: flex; gap: 20px; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 30px; font-size: 0.9rem; }
-    .nav a { color: var(--accent); text-decoration: none; font-weight: bold; }
-    .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 15px; }
-    .title { display: block; color: #f0f6fc; font-weight: 600; text-decoration: none; margin: 10px 0; }
-    .btn { display: inline-block; background: var(--green); color: #fff; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; margin-top: 15px; }
-    footer { text-align: center; font-size: 0.7rem; color: #484f58; margin-top: 50px; }
-    @media (min-width: 768px) { body { max-width: 850px; margin: auto; } }
-    </style></head><body>
-    <div class="nav"><a href="index.html">DASHBOARD</a><a href="research.html">RESEARCH HUB</a></div>
-    
-<div class="norris-profile">
-    <h2>Norris Cornell</h2>
-    <p><b>Specialist in Cyber-Physical Systems & ICS Signal Integrity</b></p>
-    
-    <p>I am a cybersecurity researcher and practitioner with nearly 20 years of hands-on experience 
-    in electronics and industrial systems. My work sits at the intersection of physical-layer 
-    security and critical infrastructure defense — approaching ICS/OT security from the sensor up, 
-    not just the network down.</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cornell Security — Norris Cornell | Cyber-Physical Systems & ICS Security</title>
+  <meta name="description" content="Cybersecurity researcher specializing in cyber-physical systems, ICS/OT security, physical-layer signal integrity, and critical infrastructure defense.">
+  <meta name="author" content="Norris Cornell">
+  <meta name="copyright" content="© 2026 Norris Cornell. All Rights Reserved.">
+  <meta property="og:title" content="Cornell Security — Norris Cornell">
+  <meta property="og:description" content="Specialist in Cyber-Physical Systems & ICS Signal Integrity">
+  <meta property="og:url" content="https://cornellsecurity.com">
+  <link rel="canonical" href="https://cornellsecurity.com">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
 
-    <p>As the author of the <b>"Inputs Lie"</b> research framework, I investigate how deterministic 
-    logic in SCADA and ICS environments can be manipulated through physical-layer signal drift, 
-    GNSS timing manipulation, and unverified external inputs. My research addresses a structural 
-    blind spot in current security frameworks: critical infrastructure systems implicitly trust 
-    external signals that can be manipulated below traditional detection thresholds by patient, 
-    sophisticated adversaries.</p>
+<!-- ── Navigation ───────────────────────────────────────────── -->
+<nav class="navbar">
+  <div class="nav-container">
+    <a href="index.html" class="nav-brand">
+      <span class="brand-icon">◈</span>
+      <span>CORNELL <span class="brand-accent">SECURITY</span></span>
+    </a>
+    <div class="nav-links" id="navLinks">
+      <a href="about.html">ABOUT</a>
+      <a href="research.html">RESEARCH</a>
+      <a href="blog.html">BLOG</a>
+      <a href="contact.html">CONTACT</a>
+    </div>
+    <button class="nav-toggle" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
+  </div>
+</nav>
 
-    <h3>Core Expertise</h3>
-    <ul>
-        <li><b>Physical-Layer Security:</b> GNSS/GPS timing vulnerabilities, RF signal integrity, and low signal-to-noise ratio attack detection in ICS/OT environments.</li>
-        <li><b>Hardware Assurance:</b> 20 years of diagnostic experience with electronic systems, control circuits, and industrial protocols including Modbus and DNP3.</li>
-        <li><b>ICS/OT Frameworks:</b> MITRE ATT&CK for ICS, NERC CIP, NIST 800-82, and Risk Management Framework (RMF).</li>
-        <li><b>Identity & Access Management:</b> Technical lead for IAM programs in regulated financial and critical infrastructure-adjacent environments.</li>
-    </ul>
+<div class="page-wrapper">
 
-    <h3>Research & Community</h3>
-    <p>I am an active contributor to the ICS security community, presenting research on the 
-    convergence of SIGINT, satellite cybersecurity, and ICS/OT security. I have presented 
-    research such as "When Cyber Meets the Spectrum" at BSides Delaware and serve as a 
-    long-term organizer and volunteer. Current research targets conference submission 
-    to the ICS Cyber Security Conference or S4.</p>
-</div>
+  <!-- ── Hero ───────────────────────────────────────────────── -->
+  <section class="hero grid-bg">
+    <div class="hero-container">
+      <div class="hero-tag">// ICS · OT · CRITICAL INFRASTRUCTURE · SIGINT</div>
+      <h1>NORRIS<br><span>CORNELL</span></h1>
+      <p class="hero-subtitle">
+        Specialist in Cyber-Physical Systems &amp; ICS Signal Integrity.
+        Nearly 20 years defending critical infrastructure — from the sensor up, not just the network down.
+      </p>
+      <div class="hero-cta">
+        <a href="research.html" class="btn btn-primary">VIEW RESEARCH</a>
+        <a href="about.html" class="btn btn-outline">ABOUT ME</a>
+      </div>
+    </div>
+  </section>
 
-    <hr style="border: 0; border-top: 1px solid var(--border); margin: 40px 0;">
-    <h3>Live Signal Intelligence</h3>
-    <div class="card"><span style="color: var(--accent); font-size: 0.7rem; font-family: monospace;">SpaceNews (Satellite/GNSS)</span>
-        <a class="title" href="https://spacenews.com/intuitive-machines-raises-175-million-in-stock-sale/" target="_blank">Intuitive Machines raises $175 million in stock sale</a><p style="color: #8b949e; font-size: 0.85rem;"><figure><img alt="Nova-c" class="attachment-rss-image-size size-rss-image-size wp-post-image" height="576" src="https://i0.wp.com/spacenews.com/wp-content/uploads/2025/11/novac-im4.jpg?fit=1024%2C576&...</p></div><div class="card"><span style="color: var(--accent); font-size: 0.7rem; font-family: monospace;">SpaceNews (Satellite/GNSS)</span>
-        <a class="title" href="https://spacenews.com/nasa-on-aggressive-schedule-to-complete-sls-repairs-for-april-launch/" target="_blank">NASA on ‘aggressive’ schedule to complete SLS repairs for April launch</a><p style="color: #8b949e; font-size: 0.85rem;"><figure><img alt="Artemis 2 rollback" class="attachment-rss-image-size size-rss-image-size wp-post-image" height="511" src="https://i0.wp.com/spacenews.com/wp-content/uploads/2026/02/KSC-20260225-PH-C...</p></div><div class="card"><span style="color: var(--accent); font-size: 0.7rem; font-family: monospace;">SpaceNews (Satellite/GNSS)</span>
-        <a class="title" href="https://spacenews.com/nasa-revises-plans-for-future-artemis-missions-cancels-upgrades-to-sls/" target="_blank">NASA revises plans for future Artemis missions, cancels upgrades to SLS</a><p style="color: #8b949e; font-size: 0.85rem;"><figure><img alt="SLS/Orion 2026 Feb 2" class="attachment-rss-image-size size-rss-image-size wp-post-image" height="683" src="https://i0.wp.com/spacenews.com/wp-content/uploads/2026/02/art2-20260202.j...</p></div><div class="card"><span style="color: var(--accent); font-size: 0.7rem; font-family: monospace;">SpaceNews (Satellite/GNSS)</span>
-        <a class="title" href="https://spacenews.com/rocket-lab-delays-neutron-debut-to-late-2026/" target="_blank">Rocket Lab delays Neutron debut to late 2026</a><p style="color: #8b949e; font-size: 0.85rem;"><figure><img alt="" class="attachment-rss-image-size size-rss-image-size wp-post-image" height="666" src="https://i0.wp.com/spacenews.com/wp-content/uploads/2024/11/Screenshot-2024-11-03-at-4.57.16%E2...</p></div><div class="card"><span style="color: var(--accent); font-size: 0.7rem; font-family: monospace;">SpaceNews (Satellite/GNSS)</span>
-        <a class="title" href="https://spacenews.com/china-set-for-its-first-one-year-human-spaceflight-mission-confirms-pakistani-astronaut-flight/" target="_blank">China set for its first one-year human spaceflight mission, confirms Pakistani astronaut flight</a><p style="color: #8b949e; font-size: 0.85rem;"><figure><img alt="Chinese astronaut Zhang Lu in a white spacesuit with red markings works outside the Tiangong space station, attached to a robotic arm, with Earth’s oceans and cloud-covered surface v...</p></div><div class="card"><span style="color: var(--accent); font-size: 0.7rem; font-family: monospace;">CyberScoop (ICS/Infrastructure)</span>
-        <a class="title" href="https://cyberscoop.com/cisa-leadership-change-madhu-gottumukkala-nick-andersen/" target="_blank">Gottumukkala out, Andersen in as acting CISA director</a><p style="color: #8b949e; font-size: 0.85rem;"><p>The move follows a story about criticisms of CISA’s performance during the first year of the Trump administration, with Madhu Gottumukkala’s leadership a point of contention.</p>
-<p>The post <a hre...</p></div><div class="card"><span style="color: var(--accent); font-size: 0.7rem; font-family: monospace;">CyberScoop (ICS/Infrastructure)</span>
-        <a class="title" href="https://cyberscoop.com/project-compass-the-com-europol/" target="_blank">Project Compass is Europol’s new playbook for taking on The Com</a><p style="color: #8b949e; font-size: 0.85rem;"><p>Officials said 30 perpetrators have been arrested in the past year, and global law enforcement cooperation is closing the gap.</p>
-<p>The post <a href="https://cyberscoop.com/project-compass-the-co...</p></div><div class="card"><span style="color: var(--accent); font-size: 0.7rem; font-family: monospace;">CyberScoop (ICS/Infrastructure)</span>
-        <a class="title" href="https://cyberscoop.com/senate-passes-health-care-cyber-reforms-cassidy/" target="_blank">Senate moves one step closer to passing health care cyber reforms</a><p style="color: #8b949e; font-size: 0.85rem;"><p>A legislative package that would overhaul cybersecurity practices at the Department of Health and Human Services sailed through committee. </p>
-<p>The post <a href="https://cyberscoop.com/senate-pa...</p></div><div class="card"><span style="color: var(--accent); font-size: 0.7rem; font-family: monospace;">CyberScoop (ICS/Infrastructure)</span>
-        <a class="title" href="https://cyberscoop.com/cisco-zero-days-cisa-emergency-directive-five-eyes/" target="_blank">Governments issue warning over Cisco zero-day attacks dating back to 2023</a><p style="color: #8b949e; font-size: 0.85rem;"><p>The global campaign marks the second series of multiple actively exploited zero-day vulnerabilities in Cisco edge technology since last spring. The similarities don’t end there.</p>
-<p>The post <a ...</p></div><div class="card"><span style="color: var(--accent); font-size: 0.7rem; font-family: monospace;">CyberScoop (ICS/Infrastructure)</span>
-        <a class="title" href="https://cyberscoop.com/vulncheck-exploited-vulnerabilities-report-2025/" target="_blank">Vulnerabilities grew like weeds in 2025, but only 1% were weaponized in attacks</a><p style="color: #8b949e; font-size: 0.85rem;"><p>Too many defenders and researchers are paying attention to defects and unsubstantiated exploit concepts that aren’t worth their time, VulnCheck’s Caitlin Condon said.</p>
-<p>The post <a href="https...</p></div><div class="card"><span style="color: var(--accent); font-size: 0.7rem; font-family: monospace;">The Record (State Actors)</span>
-        <a class="title" href="https://therecord.media/samsung-updates-acr-privacy-practices-texas" target="_blank">Samsung updates ACR privacy practices after Texas sues TV manufacturers</a><p style="color: #8b949e; font-size: 0.85rem;">In December, Texas sued five major smart TV manufacturers — Samsung, Sony, LG, Hisense and TCL Technology — for allegedly collecting ACR data without consumers in the state being fully informed and co...</p></div><div class="card"><span style="color: var(--accent); font-size: 0.7rem; font-family: monospace;">The Record (State Actors)</span>
-        <a class="title" href="https://therecord.media/instagram-alert-parents-children-search-terms-self-harm" target="_blank">Instagram to start alerting parents when children search for terms relating to self-harm</a><p style="color: #8b949e; font-size: 0.85rem;">Parents in the U.S., U.K., Australia and Canada will soon receive alerts if a child repeatedly searches Instagram for content relating to self-harm or suicide....</p></div><div class="card"><span style="color: var(--accent); font-size: 0.7rem; font-family: monospace;">The Record (State Actors)</span>
-        <a class="title" href="https://therecord.media/eu-lawmakers-propose-youth-under-16-social-media-parental-consent" target="_blank">EU lawmakers propose that youth under 16 be barred from social media without parental consent</a><p style="color: #8b949e; font-size: 0.85rem;">The opinion also states that social media access should not be allowed for children below age 13 under any circumstances....</p></div><div class="card"><span style="color: var(--accent); font-size: 0.7rem; font-family: monospace;">The Record (State Actors)</span>
-        <a class="title" href="https://therecord.media/former-air-force-officer-arrested-for-working-with-hacker-flight-training-china" target="_blank">Former Air Force officer arrested for conspiring with hacker to provide flight training to Chinese military</a><p style="color: #8b949e; font-size: 0.85rem;">Gerald Eddie Brown, 65, was arrested in Jeffersonville, Indiana on Thursday after spending nearly three years living in China and allegedly providing combat aircraft training to pilots in the Chinese ...</p></div><div class="card"><span style="color: var(--accent); font-size: 0.7rem; font-family: monospace;">The Record (State Actors)</span>
-        <a class="title" href="https://therecord.media/wyden-blocks-rudd-confirmation-nsa-cyber-command" target="_blank">Wyden blocks Rudd confirmation to lead Cyber Command, NSA</a><p style="color: #8b949e; font-size: 0.85rem;">Rudd “does not have the background that would allow him to immediately step into” the role of leading Cyber Command, Wyden wrote in a letter that was included in the Congressional Record on Wednesday....</p></div><footer>© 2026 Norris Cornell. Powered by Custom OSINT Pipeline.</footer></body></html>
+  <!-- ── Featured Research ──────────────────────────────────── -->
+  <section class="section section-dark">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">// FEATURED FRAMEWORK</span>
+        <h2>The "Inputs Lie" Research</h2>
+        <p>A structural investigation into how deterministic ICS logic can be manipulated below traditional detection thresholds.</p>
+      </div>
+
+      <div class="research-banner">
+        <h3>Inputs Lie: Trusting the Unverifiable in Critical Infrastructure</h3>
+        <p>
+          SCADA and ICS environments implicitly trust external signals — GNSS timing, sensor feeds,
+          industrial protocol inputs — that can be manipulated by patient, sophisticated adversaries
+          operating below conventional detection thresholds. This framework investigates the structural
+          blind spot at the heart of most critical infrastructure security models.
+        </p>
+        <a href="research.html" class="btn btn-outline">READ THE FRAMEWORK →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Core Expertise ─────────────────────────────────────── -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">// CORE EXPERTISE</span>
+        <h2>Where I Operate</h2>
+      </div>
+      <div class="grid-3">
+
+        <div class="card">
+          <div class="card-tag">PHYSICAL LAYER</div>
+          <h3>Signal Integrity & RF Security</h3>
+          <p>GNSS/GPS timing vulnerabilities, RF signal integrity analysis, and low-SNR attack detection in ICS/OT environments.</p>
+          <div class="tag-list">
+            <span class="tag">GNSS/GPS</span>
+            <span class="tag">RF Analysis</span>
+            <span class="tag">Timing Attacks</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-tag">HARDWARE ASSURANCE</div>
+          <h3>Industrial Systems & Protocols</h3>
+          <p>20 years of diagnostic experience with electronic systems, control circuits, and industrial protocols including Modbus and DNP3.</p>
+          <div class="tag-list">
+            <span class="tag">Modbus</span>
+            <span class="tag">DNP3</span>
+            <span class="tag">ICS/OT</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-tag">FRAMEWORKS & COMPLIANCE</div>
+          <h3>ICS Security Frameworks</h3>
+          <p>MITRE ATT&amp;CK for ICS, NERC CIP, NIST 800-82, and Risk Management Framework applied to critical infrastructure environments.</p>
+          <div class="tag-list">
+            <span class="tag">MITRE ICS</span>
+            <span class="tag">NERC CIP</span>
+            <span class="tag">NIST 800-82</span>
+            <span class="tag">RMF</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Latest Writing ─────────────────────────────────────── -->
+  <section class="section section-alt">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">// LATEST WRITING</span>
+        <h2>Research &amp; Analysis</h2>
+        <p>Technical white papers and commentary on ICS security, critical infrastructure, and the physical layer.</p>
+      </div>
+
+      <div class="post-list">
+
+        <a href="research.html#grid-targeting" style="text-decoration:none;">
+          <div class="post-item">
+            <div>
+              <div class="post-meta">FEBRUARY 2026 · WHITE PAPER</div>
+              <h3>When the Grid Becomes a Targeting Sensor: The Lethal Feedback Loop</h3>
+              <p>Examining how smart grid infrastructure can be repurposed as a passive intelligence-collection layer against critical targets.</p>
+            </div>
+            <span class="post-badge badge-wp">WHITE PAPER</span>
+          </div>
+        </a>
+
+        <a href="research.html#inputs-lie" style="text-decoration:none;">
+          <div class="post-item">
+            <div>
+              <div class="post-meta">2026 · RESEARCH FRAMEWORK</div>
+              <h3>Inputs Lie: The Structural Blind Spot in ICS Trust Models</h3>
+              <p>The foundational thesis behind the Inputs Lie framework — how unverified external signals undermine deterministic control logic.</p>
+            </div>
+            <span class="post-badge badge-wp">FRAMEWORK</span>
+          </div>
+        </a>
+
+        <a href="blog.html" style="text-decoration:none;">
+          <div class="post-item">
+            <div>
+              <div class="post-meta">FEBRUARY 2026 · ANALYSIS</div>
+              <h3>When Cyber Meets the Spectrum</h3>
+              <p>Presented at BSides Delaware — exploring the convergence of SIGINT, satellite cybersecurity, and ICS/OT attack surfaces.</p>
+            </div>
+            <span class="post-badge badge-blog">PRESENTATION</span>
+          </div>
+        </a>
+
+      </div>
+
+      <div class="mt-3">
+        <a href="research.html" class="btn btn-outline">ALL RESEARCH →</a>
+        &nbsp;&nbsp;
+        <a href="blog.html" class="btn btn-outline">ALL POSTS →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Speaking / Community ───────────────────────────────── -->
+  <section class="section section-dark">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">// COMMUNITY</span>
+        <h2>Speaking &amp; Contributions</h2>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-tag">CONFERENCE</div>
+          <h3>BSides Delaware</h3>
+          <p>Presenter and long-term organizer at BSides Delaware. Research presented: <em>"When Cyber Meets the Spectrum"</em> — on the convergence of SIGINT, satellite cybersecurity, and ICS/OT security.</p>
+        </div>
+        <div class="card">
+          <div class="card-tag">CURRENT TARGETS</div>
+          <h3>Upcoming Submissions</h3>
+          <p>Targeting submission to the <strong style="color:#fff">ICS Cyber Security Conference</strong> and <strong style="color:#fff">S4</strong> with ongoing research on GNSS timing manipulation and physical-layer ICS attacks.</p>
+          <a href="contact.html" class="card-link">GET IN TOUCH →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /page-wrapper -->
+
+<!-- ── Footer ─────────────────────────────────────────────── -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">CORNELL <span>SECURITY</span></div>
+    <div class="footer-copy">© 2026 NORRIS CORNELL · ALL RIGHTS RESERVED</div>
+  </div>
+  <div class="footer-legal">
+    All content, research, frameworks, and written works published on this site are the intellectual property of Norris Cornell
+    and are protected by copyright. Reproduction, redistribution, or use in any form without prior written permission is prohibited.
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog — Cornell Security</title>
+  <meta name="description" content="Commentary, analysis, and field observations on ICS security, critical infrastructure, signal integrity, and cyber-physical systems.">
+  <meta name="author" content="Norris Cornell">
+  <meta name="copyright" content="© 2026 Norris Cornell. All Rights Reserved.">
+  <link rel="canonical" href="https://cornellsecurity.com/blog.html">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-container">
+    <a href="index.html" class="nav-brand">
+      <span class="brand-icon">◈</span>
+      <span>CORNELL <span class="brand-accent">SECURITY</span></span>
+    </a>
+    <div class="nav-links" id="navLinks">
+      <a href="about.html">ABOUT</a>
+      <a href="research.html">RESEARCH</a>
+      <a href="blog.html" class="active">BLOG</a>
+      <a href="contact.html">CONTACT</a>
+    </div>
+    <button class="nav-toggle" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
+  </div>
+</nav>
+
+<div class="page-wrapper">
+
+  <div class="page-header">
+    <div class="page-header-content">
+      <span class="section-label">// BLOG</span>
+      <h1>Field Notes &amp; Analysis</h1>
+      <p>Commentary on ICS security, critical infrastructure, signal integrity, and the physical layer.</p>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="container">
+
+      <!-- ── How to add a post ─────────────────────────────── -->
+      <!-- To add a new post:
+           1. Duplicate one of the <a class="post-item"> blocks below
+           2. Update the date, title, excerpt, and link href
+           3. Change the badge class: badge-blog (article), badge-wp (white paper), badge-draft (draft)
+           4. Create a new HTML file in the /blog/ folder for the full post
+      -->
+
+      <div class="post-list">
+
+        <a href="blog/draft-article-02-25-2026.html" style="text-decoration:none;">
+          <div class="post-item">
+            <div>
+              <div class="post-meta">FEBRUARY 25, 2026 · ANALYSIS</div>
+              <h3>Draft Article — February 25, 2026</h3>
+              <p>Field analysis and commentary — current working draft. Check back for the published version.</p>
+            </div>
+            <span class="post-badge badge-draft">DRAFT</span>
+          </div>
+        </a>
+
+        <a href="blog/when-cyber-meets-the-spectrum.html" style="text-decoration:none;">
+          <div class="post-item">
+            <div>
+              <div class="post-meta">BSIDES DELAWARE · PRESENTATION RECAP</div>
+              <h3>When Cyber Meets the Spectrum</h3>
+              <p>A recap of the BSides Delaware presentation on the convergence of SIGINT, satellite cybersecurity, and ICS/OT attack surfaces. What defenders miss when they only look at the network.</p>
+            </div>
+            <span class="post-badge badge-blog">PRESENTATION</span>
+          </div>
+        </a>
+
+        <a href="blog/why-inputs-lie.html" style="text-decoration:none;">
+          <div class="post-item">
+            <div>
+              <div class="post-meta">2026 · INTRODUCTORY POST</div>
+              <h3>Why Inputs Lie — An Introduction to the Framework</h3>
+              <p>A plain-language introduction to the core argument: that ICS security models have a structural vulnerability baked into their fundamental assumptions about input trustworthiness.</p>
+            </div>
+            <span class="post-badge badge-blog">ARTICLE</span>
+          </div>
+        </a>
+
+      </div>
+
+      <!-- Add more posts above this line -->
+
+      <div class="mt-3" style="text-align:center; padding:2rem; border:1px dashed var(--border); border-radius:var(--radius);">
+        <p style="font-family:var(--font-mono); font-size:0.75rem; color:var(--text-muted); letter-spacing:0.1em;">
+          // MORE POSTS COMING — CHECK BACK SOON
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">CORNELL <span>SECURITY</span></div>
+    <div class="footer-copy">© 2026 NORRIS CORNELL · ALL RIGHTS RESERVED</div>
+  </div>
+  <div class="footer-legal">
+    All content, research, frameworks, and written works published on this site are the intellectual property of Norris Cornell
+    and are protected by copyright. Reproduction, redistribution, or use in any form without prior written permission is prohibited.
+  </div>
+</footer>
+
+</body>
+</html>

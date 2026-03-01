@@ -1,27 +1,219 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name='viewport' content='width=device-width, initial-scale=1.0'>
-    <title>RESEARCH | Norris Cornell</title><style>
-    :root { --bg: #0d1117; --card: #161b22; --border: #30363d; --text: #c9d1d9; --accent: #58a6ff; --green: #3fb950; }
-    body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; line-height: 1.6; }
-    .nav { display: flex; gap: 20px; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 30px; font-size: 0.9rem; }
-    .nav a { color: var(--accent); text-decoration: none; font-weight: bold; }
-    .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 15px; }
-    .title { display: block; color: #f0f6fc; font-weight: 600; text-decoration: none; margin: 10px 0; }
-    .btn { display: inline-block; background: var(--green); color: #fff; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; margin-top: 15px; }
-    footer { text-align: center; font-size: 0.7rem; color: #484f58; margin-top: 50px; }
-    @media (min-width: 768px) { body { max-width: 850px; margin: auto; } }
-    </style></head><body>
-    <div class="nav"><a href="index.html">DASHBOARD</a><a href="research.html">RESEARCH HUB</a></div>
-    <h1>Technical Research & Whitepapers</h1>
-    <div class="card">
-        <div style="font-weight: bold; color: #fff; font-size: 1.2rem; margin-bottom: 10px;">Signal Manipulation in ICS: Why Traditional Security Fails at the Physics Layer</div>
-        <p style="font-style: italic; color: #8b949e;"><b>Abstract:</b> Industrial control systems rely on deterministic assumptions that inputs follow physical laws. This research explores how "When Harmonics Become Attack Vectors," traditional security fails to detect signal drift manipulated below detection thresholds.</p>
-        <div style="margin: 15px 0;"><strong style="font-size: 0.8rem; color: var(--accent);">TECHNICAL DEPTH:</strong>
-            <ul style="font-size: 0.85rem; color: #8b949e;">
-                <li>RF Signal Analysis & GNSS Timing Vulnerabilities</li>
-                <li>Low Signal-to-Noise Ratio attack detection methodologies</li>
-                <li>Physics-layer modeling of sensor harmonic distortion</li>
-            </ul>
-        </div>
-        <a href="mailto:npcornell@hotmail.com?subject=Access Request: ICS Physics Paper" class="btn">Request Full Technical Annex (PDF)</a>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Research & White Papers — Cornell Security</title>
+  <meta name="description" content="Technical white papers and research frameworks on ICS/OT security, physical-layer attacks, GNSS vulnerabilities, and critical infrastructure defense.">
+  <meta name="author" content="Norris Cornell">
+  <meta name="copyright" content="© 2026 Norris Cornell. All Rights Reserved.">
+  <link rel="canonical" href="https://cornellsecurity.com/research.html">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .wp-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+      transition: all var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    .wp-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 3px; height: 100%;
+      background: var(--accent-green);
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+    .wp-card:hover { border-color: rgba(0,255,159,0.2); background: var(--bg-card-hover); box-shadow: var(--glow-green); }
+    .wp-card:hover::before { opacity: 1; }
+    .wp-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+    .wp-card h3 { font-family: var(--font-heading); font-size: 1.3rem; font-weight: 600; color: #fff; line-height: 1.3; }
+    .wp-card .abstract { color: var(--text-secondary); font-size: 0.92rem; line-height: 1.75; margin-bottom: 1.25rem; }
+    .wp-meta { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); letter-spacing: 0.1em; margin-bottom: 0.6rem; }
+    .wp-topics { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .topic-tag { font-family: var(--font-mono); font-size: 0.65rem; padding: 0.2rem 0.55rem; border-radius: var(--radius); border: 1px solid rgba(0,255,159,0.25); color: var(--accent-green); background: rgba(0,255,159,0.06); letter-spacing: 0.1em; }
+    .coming-soon { opacity: 0.55; cursor: default; }
+    .coming-soon::before { background: var(--text-muted) !important; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-container">
+    <a href="index.html" class="nav-brand">
+      <span class="brand-icon">◈</span>
+      <span>CORNELL <span class="brand-accent">SECURITY</span></span>
+    </a>
+    <div class="nav-links" id="navLinks">
+      <a href="about.html">ABOUT</a>
+      <a href="research.html" class="active">RESEARCH</a>
+      <a href="blog.html">BLOG</a>
+      <a href="contact.html">CONTACT</a>
     </div>
-    <footer>© 2026 Norris Cornell. Novel research protected by cryptographic timestamping.</footer></body></html>
+    <button class="nav-toggle" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
+  </div>
+</nav>
+
+<div class="page-wrapper">
+
+  <div class="page-header">
+    <div class="page-header-content">
+      <span class="section-label">// RESEARCH &amp; WHITE PAPERS</span>
+      <h1>Technical Research</h1>
+      <p>Original frameworks and white papers on ICS/OT security, physical-layer vulnerabilities, and critical infrastructure defense.</p>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="container">
+
+      <div class="section-header">
+        <span class="section-label">// ORIGINAL FRAMEWORKS</span>
+        <h2>Research Frameworks</h2>
+      </div>
+
+      <!-- Inputs Lie -->
+      <div class="wp-card" id="inputs-lie">
+        <div class="wp-meta">2026 · RESEARCH FRAMEWORK · NORRIS CORNELL</div>
+        <div class="wp-header">
+          <h3>Inputs Lie: The Structural Blind Spot in ICS Trust Models</h3>
+          <span class="post-badge badge-wp">FRAMEWORK</span>
+        </div>
+        <p class="abstract">
+          SCADA and ICS environments are built on deterministic logic — if an input signal says a value,
+          the system acts on it. But what happens when that input is wrong? Not wrong due to a fault,
+          but wrong due to deliberate manipulation, operating below the threshold of any installed
+          monitoring system?
+        </p>
+        <p class="abstract">
+          The "Inputs Lie" framework addresses a structural blind spot: critical infrastructure systems
+          implicitly trust external signals — GNSS timing, sensor feeds, industrial protocol inputs —
+          that can be manipulated by patient, sophisticated adversaries using physical-layer techniques.
+          GNSS spoofing, signal injection, and sub-threshold drift are not theoretical. They are the
+          next frontier of attacks against infrastructure that assumes its inputs are clean.
+        </p>
+        <div class="wp-topics">
+          <span class="topic-tag">GNSS SPOOFING</span>
+          <span class="topic-tag">SIGNAL INTEGRITY</span>
+          <span class="topic-tag">ICS TRUST MODELS</span>
+          <span class="topic-tag">SCADA</span>
+          <span class="topic-tag">PHYSICAL-LAYER ATTACKS</span>
+          <span class="topic-tag">DETECTION EVASION</span>
+        </div>
+      </div>
+
+      <div class="section-header mt-3">
+        <span class="section-label">// WHITE PAPERS</span>
+        <h2>White Papers</h2>
+      </div>
+
+      <!-- Grid Targeting -->
+      <div class="wp-card" id="grid-targeting">
+        <div class="wp-meta">FEBRUARY 2026 · WHITE PAPER · NORRIS CORNELL</div>
+        <div class="wp-header">
+          <h3>When the Grid Becomes a Targeting Sensor: The Lethal Feedback Loop</h3>
+          <span class="post-badge badge-wp">WHITE PAPER</span>
+        </div>
+        <p class="abstract">
+          Smart grid infrastructure — built to optimize energy distribution — generates continuous,
+          high-resolution data about occupancy patterns, operational rhythms, and activity signatures
+          at facilities across the national grid. This paper examines how that telemetry can be
+          repurposed as a passive intelligence-collection layer, creating a feedback loop in which
+          the infrastructure being protected becomes the instrument of targeting.
+        </p>
+        <p class="abstract">
+          The implications for critical infrastructure operators, defense planners, and civilian
+          facilities connected to smart grid networks represent an underexamined convergence of
+          physical security and cyber intelligence.
+        </p>
+        <div class="wp-topics">
+          <span class="topic-tag">SMART GRID</span>
+          <span class="topic-tag">CRITICAL INFRASTRUCTURE</span>
+          <span class="topic-tag">INTELLIGENCE COLLECTION</span>
+          <span class="topic-tag">OPERATIONAL SECURITY</span>
+          <span class="topic-tag">ICS/OT</span>
+        </div>
+      </div>
+
+      <div class="section-header mt-3">
+        <span class="section-label">// CONFERENCE PRESENTATIONS</span>
+        <h2>Presentations</h2>
+      </div>
+
+      <div class="wp-card">
+        <div class="wp-meta">BSIDES DELAWARE · PRESENTATION · NORRIS CORNELL</div>
+        <div class="wp-header">
+          <h3>When Cyber Meets the Spectrum</h3>
+          <span class="post-badge badge-blog">PRESENTATION</span>
+        </div>
+        <p class="abstract">
+          Presented at BSides Delaware. This talk examined the convergence of signals intelligence (SIGINT),
+          satellite cybersecurity, and ICS/OT attack surfaces — exploring how spectrum-based attack
+          techniques intersect with industrial control environments and what defenders need to understand
+          about threats that operate below Layer 2.
+        </p>
+        <div class="wp-topics">
+          <span class="topic-tag">SIGINT</span>
+          <span class="topic-tag">SATELLITE SECURITY</span>
+          <span class="topic-tag">ICS/OT</span>
+          <span class="topic-tag">BSIDES DELAWARE</span>
+          <span class="topic-tag">RF SPECTRUM</span>
+        </div>
+      </div>
+
+      <div class="section-header mt-3">
+        <span class="section-label">// IN PROGRESS</span>
+        <h2>Upcoming Research</h2>
+      </div>
+
+      <div class="wp-card coming-soon">
+        <div class="wp-meta">FORTHCOMING · TARGET: ICS CYBER SECURITY CONFERENCE / S4</div>
+        <div class="wp-header">
+          <h3>GNSS Timing Manipulation as an ICS Attack Vector</h3>
+          <span class="post-badge badge-draft">IN PROGRESS</span>
+        </div>
+        <p class="abstract">
+          Research in progress targeting submission to the ICS Cyber Security Conference or S4.
+          Examining precision timing attacks against industrial control systems that rely on
+          GPS-synchronized clocks for process coordination and event logging.
+        </p>
+        <div class="wp-topics">
+          <span class="topic-tag">GNSS</span>
+          <span class="topic-tag">TIMING ATTACKS</span>
+          <span class="topic-tag">ICS</span>
+          <span class="topic-tag">FORTHCOMING</span>
+        </div>
+      </div>
+
+      <div class="mt-3" style="border:1px solid var(--border); border-radius:var(--radius); padding:1.5rem; background:rgba(0,212,255,0.03);">
+        <p style="font-size:0.82rem; color:var(--text-muted); font-family:var(--font-mono); line-height:1.7;">
+          © 2026 Norris Cornell. All research frameworks, white papers, and written works on this page are the
+          exclusive intellectual property of Norris Cornell and are protected under copyright law. No portion may be
+          reproduced, republished, cited in commercial work, or distributed in any form without prior written
+          permission. For licensing or collaboration inquiries, <a href="contact.html">contact here</a>.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">CORNELL <span>SECURITY</span></div>
+    <div class="footer-copy">© 2026 NORRIS CORNELL · ALL RIGHTS RESERVED</div>
+  </div>
+  <div class="footer-legal">
+    All content, research, frameworks, and written works published on this site are the intellectual property of Norris Cornell
+    and are protected by copyright. Reproduction, redistribution, or use in any form without prior written permission is prohibited.
+  </div>
+</footer>
+
+</body>
+</html>
