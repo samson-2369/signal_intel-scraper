@@ -9,8 +9,9 @@ WEB_ROOT = "/Users/jackcornell/Documents/GitHub/signal_intel-scraper"
 
 # --- CONFIGURATION: IDENTITY & IP PROTECTION ---
 AUTHOR = "Norris Cornell"
-EMAIL = "npcornell@hotmail.com"  # Linked to your resume records
+EMAIL = "npcornell@hotmail.com" 
 STATION_ID = "CORNELL SECURITY | PORTFOLIO & INTEL"
+DOMAIN = "cornellsecurity.com"
 
 # --- CONFIGURATION: GROUNDED ABOUT ME ---
 ABOUT_ME_HTML = f"""
@@ -67,8 +68,6 @@ def scrape_intel():
     return all_entries
 
 def generate_web_pages(intel):
-    now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    
     # --- SHARED STYLING ---
     STYLE = """
     :root { --bg: #0d1117; --card: #161b22; --border: #30363d; --text: #c9d1d9; --accent: #58a6ff; --green: #3fb950; }
@@ -94,7 +93,6 @@ def generate_web_pages(intel):
         index_html += f"""<div class="card"><span style="color: var(--accent); font-size: 0.7rem; font-family: monospace;">{item['source']}</span>
         <a class="title" href="{item['link']}" target="_blank">{item['title']}</a><p style="color: #8b949e; font-size: 0.85rem;">{item['summary'][:200]}...</p></div>"""
     index_html += f"<footer>© 2026 {AUTHOR}. Powered by Custom OSINT Pipeline.</footer></body></html>"
-    
     with open(os.path.join(WEB_ROOT, "index.html"), "w") as f: f.write(index_html)
 
     # --- 2. GENERATE RESEARCH.HTML (IP PROTECTED HUB) ---
@@ -115,24 +113,26 @@ def generate_web_pages(intel):
         <a href="mailto:{EMAIL}?subject=Access Request: ICS Physics Paper" class="btn">Request Full Technical Annex (PDF)</a>
     </div>
     <footer>© 2026 {AUTHOR}. Novel research protected by cryptographic timestamping.</footer></body></html>"""
-    
     with open(os.path.join(WEB_ROOT, "research.html"), "w") as f: f.write(research_html)
+
+    # --- 3. THE PERMANENT CNAME FIX ---
+    with open(os.path.join(WEB_ROOT, "CNAME"), "w") as f: f.write(DOMAIN)
+    print(f"✅ Domain mapping ({DOMAIN}) locked in.")
 
 def generate_obsidian_log(intel):
     file_date = datetime.now().strftime("%Y-%m-%d")
     md_content = f"# Signal Intel Report: {file_date}\n\n"
     for item in intel:
         md_content += f"### {item['title']}\n**Source:** {item['source']}\n**Link:** {item['link']}\n\n> {item['summary']}\n\n---\n"
-    
     with open(os.path.join(OBSIDIAN_PATH, f"Intel-{file_date}.md"), "w") as f: f.write(md_content)
 
 def push_to_web():
     try:
         os.chdir(WEB_ROOT)
         subprocess.run(["git", "add", "."], check=True)
-        subprocess.run(["git", "commit", "-m", f"Automated Update: {datetime.now().strftime('%Y-%m-%d')}"], check=True)
+        subprocess.run(["git", "commit", "-m", f"Norris Cornell Pipeline Update: {datetime.now().strftime('%Y-%m-%d')}"], check=True)
         subprocess.run(["git", "push", "origin", "master", "--force"], check=True)
-        print(f"🟢 SUCCESS: {AUTHOR}'s Research Station is LIVE.")
+        print(f"🟢 SUCCESS: {AUTHOR}'s Research Station is LIVE and SECURE.")
     except Exception as e: print(f"❌ Deploy Failed: {e}")
 
 if __name__ == "__main__":
